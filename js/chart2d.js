@@ -133,16 +133,32 @@ export function render2DChart() {
     } else {
         const actualType = chartType === 'horizontalBar' ? 'bar' : chartType;
         const isPie = ['pie', 'doughnut', 'polarArea'].includes(chartType);
+
+        let bgFill = isPie ? themePalette : primaryThemeColor;
+        let lineBorderColor = isPie ? themePalette : primaryThemeColor;
+        if (chartType === 'line' && ctx) {
+            const grad = ctx.createLinearGradient(0, 0, 0, 300);
+            grad.addColorStop(0, 'rgba(192, 132, 252, 0.45)');
+            grad.addColorStop(0.6, 'rgba(99, 102, 241, 0.15)');
+            grad.addColorStop(1, 'rgba(13, 8, 30, 0.0)');
+            bgFill = grad;
+            lineBorderColor = '#c084fc';
+        }
+
         const ds = {
             label: appState.parsedData.headers[yIdx],
             data: values,
-            backgroundColor: isPie ? themePalette : primaryThemeColor,
-            borderColor: isPie ? themePalette : primaryThemeColor,
-            borderWidth: 2,
+            backgroundColor: bgFill,
+            borderColor: lineBorderColor,
+            borderWidth: chartType === 'line' ? 3 : 2,
             fill: chartType === 'line' ? 'origin' : undefined,
-            tension: chartType === 'line' ? 0.4 : undefined,
-            pointRadius: chartType === 'line' ? 4 : undefined,
-            borderRadius: chartType === 'bar' || chartType === 'horizontalBar' ? 4 : undefined,
+            tension: chartType === 'line' ? 0.45 : undefined,
+            pointRadius: chartType === 'line' ? 5 : undefined,
+            pointHoverRadius: chartType === 'line' ? 8 : undefined,
+            pointBackgroundColor: chartType === 'line' ? '#c084fc' : undefined,
+            pointBorderColor: chartType === 'line' ? '#ffffff' : undefined,
+            pointBorderWidth: chartType === 'line' ? 2 : undefined,
+            borderRadius: chartType === 'bar' || chartType === 'horizontalBar' ? 8 : undefined,
         };
         const cfg = {
             type: actualType,
@@ -160,24 +176,24 @@ export function render2DChart() {
 function chartOptions(type, xLabel, yLabel) {
     const isPie = ['pie', 'doughnut', 'polarArea'].includes(type);
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const textColor = isDark ? '#cbd5e1' : '#64748b';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
-    const tooltipBg = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-    const tooltipTitle = isDark ? '#a5b4fc' : '#4338ca';
-    const tooltipBody = isDark ? '#f1f5f9' : '#1e293b';
-    const tooltipBorder = isDark ? 'rgba(99, 102, 241, 0.4)' : '#cbd5e1';
+    const textColor = isDark ? '#e2e8f0' : '#475569';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)';
+    const tooltipBg = isDark ? 'rgba(13, 8, 30, 0.92)' : 'rgba(255, 255, 255, 0.94)';
+    const tooltipTitle = isDark ? '#c084fc' : '#4f46e5';
+    const tooltipBody = isDark ? '#f1f5f9' : '#0f172a';
+    const tooltipBorder = isDark ? 'rgba(255, 255, 255, 0.22)' : 'rgba(99, 102, 241, 0.25)';
 
     return {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 600, easing: 'easeOutQuart' },
         plugins: {
-            legend: { display: isPie, position: 'right', labels: { color: isDark ? '#f1f5f9' : '#334155', font: { size: 10 }, padding: 6 } },
-            tooltip: { backgroundColor: tooltipBg, titleColor: tooltipTitle, bodyColor: tooltipBody, borderColor: tooltipBorder, borderWidth: 1, padding: 10, cornerRadius: 8 }
+            legend: { display: isPie, position: 'right', labels: { color: isDark ? '#f1f5f9' : '#334155', font: { size: 11, weight: 600 }, padding: 8 } },
+            tooltip: { backgroundColor: tooltipBg, titleColor: tooltipTitle, bodyColor: tooltipBody, borderColor: tooltipBorder, borderWidth: 1, padding: 12, cornerRadius: 14 }
         },
         scales: isPie ? {} : {
-            x: { title: { display: true, text: xLabel, color: textColor, font: { size: 11 } }, ticks: { color: textColor, maxRotation: 45, font: { size: 9 } }, grid: { color: gridColor } },
-            y: { title: { display: true, text: yLabel, color: textColor, font: { size: 11 } }, ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor }, beginAtZero: true }
+            x: { title: { display: true, text: xLabel, color: textColor, font: { size: 11, weight: 600 } }, ticks: { color: textColor, maxRotation: 45, font: { size: 10 } }, grid: { color: gridColor } },
+            y: { title: { display: true, text: yLabel, color: textColor, font: { size: 11, weight: 600 } }, ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor }, beginAtZero: true }
         }
     };
 }

@@ -1,489 +1,369 @@
 /* ==============================================================================
- * [figma-glass.css] Figma Glass Effect Playground 기반 초정밀 글래스모피즘 시스템
+ * [figma-glass.css] Figma Glass Effect Playground 기반 실시간 UI 디자인 시스템
  * ==============================================================================
- * 피그마(Figma) 공식 Glass Effect 핵심 5대 원리 완벽 구현:
- * 1. Light (조명 & 림 하이라이트): 모서리와 표면에 맺히는 빛의 입체적 반사
- * 2. Frost (서리 효과): 심도 있는 다단계 배경 블러(backdrop-filter blur)
- * 3. Depth (깊이감): 복합 다층 섀도우(Ambient + Contact + Inner Glow)
- * 4. Refraction (굴절 & 투명도): 각도별 액체 유리 반사 그라디언트
- * 5. Dispersion (분산 & 프리즘 광택): 인터랙션 시 은은한 스펙트럼 발광
+ * 피그마(Figma) 공식 Glass Effect 원형(Liquid Glass, Depth, Frost, Light) 완벽 적용:
+ * - 32px 둥근 모서리의 초정밀 리퀴드 글래스 카드
+ * - 36px 딥 서리 블러(Backdrop Filter Blur) & 림 라이트 스펙큘러 하이라이트
+ * - 외곽 은은한 바이올렛/네온 앰비언트 글로우(Ambient Glow)
+ * - '사형(설명/테이블)은 빼고 📊 2D 분석 그래프만' 집중 표출
  * ============================================================================== */
 
 /* -----------------------------------------------------------------------------
- * 1. 공통 글래스 변수 및 기본 속성
+ * 1. 피그마 글래스 토큰 및 테마 변수
  * ----------------------------------------------------------------------------- */
 :root {
-  --glass-blur: 22px;
-  --glass-saturate: 185%;
-  --glass-contrast: 96%;
-  --glass-radius-lg: 16px;
-  --glass-radius-md: 12px;
-  --glass-radius-sm: 8px;
-  --glass-transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --fg-blur-deep: 34px;
+  --fg-saturate: 190%;
+  --fg-contrast: 96%;
+  --fg-card-radius: 30px;
+  --fg-pill-radius: 9999px;
+  --fg-elem-radius: 14px;
+  --fg-transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 라이트 모드 글래스 테마 */
-html[data-theme="light"] {
-  --fg-glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(241, 245, 249, 0.58) 100%);
-  --fg-glass-card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(248, 250, 252, 0.48) 100%);
-  --fg-glass-header-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(241, 245, 249, 0.72) 100%);
-  --fg-glass-border: 1px solid rgba(255, 255, 255, 0.65);
-  --fg-glass-border-subtle: 1px solid rgba(99, 102, 241, 0.18);
-  --fg-glass-border-highlight: 1px solid rgba(99, 102, 241, 0.45);
-  --fg-glass-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.12), 
-                     0 4px 14px -2px rgba(15, 23, 42, 0.05), 
-                     inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.85);
-  --fg-glass-shadow-hover: 0 20px 42px -6px rgba(99, 102, 241, 0.18), 
-                           0 6px 18px -2px rgba(99, 102, 241, 0.1), 
-                           inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95);
-  --fg-glass-inner-specular: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.9), 
-                             inset 0 -1px 1px 0 rgba(0, 0, 0, 0.04);
-  --fg-glass-btn-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(241, 245, 249, 0.65) 100%);
-  --fg-glass-input-bg: rgba(255, 255, 255, 0.75);
-}
-
-/* 다크 모드 글래스 테마 */
+/* 다크 모드 (피그마 공식 바이올렛/코스믹 글래스 테마) */
 html[data-theme="dark"] {
-  --fg-glass-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.74) 0%, rgba(15, 23, 42, 0.62) 100%);
-  --fg-glass-card-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.55) 0%, rgba(15, 23, 42, 0.45) 100%);
-  --fg-glass-header-bg: linear-gradient(180deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.75) 100%);
-  --fg-glass-border: 1px solid rgba(255, 255, 255, 0.14);
-  --fg-glass-border-subtle: 1px solid rgba(99, 102, 241, 0.28);
-  --fg-glass-border-highlight: 1px solid rgba(129, 140, 248, 0.55);
-  --fg-glass-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.55), 
-                     0 6px 18px -2px rgba(0, 0, 0, 0.35), 
-                     inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.22);
-  --fg-glass-shadow-hover: 0 24px 52px -6px rgba(0, 0, 0, 0.65), 
-                           0 8px 24px -2px rgba(99, 102, 241, 0.35), 
-                           inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.35);
-  --fg-glass-inner-specular: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.25), 
-                             inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
-  --fg-glass-btn-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.65) 100%);
-  --fg-glass-input-bg: rgba(15, 23, 42, 0.65);
+  --fg-glass-card-bg: radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.18), transparent 50%),
+                      linear-gradient(135deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.02) 100%);
+  --fg-glass-panel-bg: radial-gradient(circle at 75% 10%, rgba(147, 51, 234, 0.14), transparent 45%),
+                       linear-gradient(135deg, rgba(30, 41, 59, 0.72) 0%, rgba(15, 23, 42, 0.65) 100%);
+  --fg-glass-btn-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  --fg-glass-border: 1px solid rgba(255, 255, 255, 0.20);
+  --fg-glass-border-subtle: 1px solid rgba(255, 255, 255, 0.12);
+  --fg-glass-border-hover: 1px solid rgba(192, 132, 252, 0.55);
+  --fg-glass-shadow: 0 28px 65px -10px rgba(0, 0, 0, 0.65), 
+                     0 0 45px rgba(147, 51, 234, 0.22), 
+                     inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.45);
+  --fg-glass-shadow-hover: 0 32px 75px -8px rgba(0, 0, 0, 0.75), 
+                           0 0 55px rgba(168, 85, 247, 0.35), 
+                           inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.65);
+  --fg-glass-specular: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.4), 
+                       inset 0 -1px 1px 0 rgba(0, 0, 0, 0.35);
+  --fg-body-bg: radial-gradient(circle at 75% 20%, #231247 0%, #0d081e 65%, #080514 100%);
+}
+
+/* 라이트 모드 (맑은 프로스트 크리스탈 글래스 테마) */
+html[data-theme="light"] {
+  --fg-glass-card-bg: radial-gradient(circle at 85% 15%, rgba(147, 51, 234, 0.10), transparent 50%),
+                      linear-gradient(135deg, rgba(255, 255, 255, 0.82) 0%, rgba(243, 244, 246, 0.62) 100%);
+  --fg-glass-panel-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 252, 0.68) 100%);
+  --fg-glass-btn-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(241, 245, 249, 0.65) 100%);
+  --fg-glass-border: 1px solid rgba(255, 255, 255, 0.85);
+  --fg-glass-border-subtle: 1px solid rgba(99, 102, 241, 0.18);
+  --fg-glass-border-hover: 1px solid rgba(124, 58, 237, 0.45);
+  --fg-glass-shadow: 0 20px 48px -8px rgba(15, 23, 42, 0.14), 
+                     0 0 35px rgba(147, 51, 234, 0.12), 
+                     inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.95);
+  --fg-glass-shadow-hover: 0 24px 56px -6px rgba(15, 23, 42, 0.18), 
+                           0 0 45px rgba(147, 51, 234, 0.20), 
+                           inset 0 1.5px 2px 0 rgba(255, 255, 255, 1);
+  --fg-glass-specular: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.9), 
+                       inset 0 -1px 1px 0 rgba(0, 0, 0, 0.05);
+  --fg-body-bg: radial-gradient(circle at 75% 20%, #f1f0fd 0%, #f8fafc 70%, #edf2f7 100%);
+}
+
+/* 글로벌 배경 적용 */
+html body {
+  background: var(--fg-body-bg) fixed !important;
 }
 
 /* -----------------------------------------------------------------------------
- * 2. 상단 글로벌 컨트롤 바 (Glass Navigation Bar)
+ * 2. 📊 핵심 2D 분석 그래프 카드 (#chart-panel)
+ * -----------------------------------------------------------------------------
+ * 사용자의 핵심 요구사항:
+ * "📊이거 그래프만 표시해줘 사형(설명/테이블)은빼고" -> 오직 그래프만 전면 표시
+ * "비슷한 스타일로 수정해서 적용해줘" -> Figma Glass Card 원형 스타일링
  * ----------------------------------------------------------------------------- */
-#top-bar {
-  background: var(--fg-glass-header-bg) !important;
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  border-bottom: var(--fg-glass-border) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08), var(--fg-glass-inner-specular) !important;
-  transition: var(--glass-transition);
+#chart-panel {
+  background: var(--fg-glass-card-bg) !important;
+  backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  -webkit-backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  border-radius: var(--fg-card-radius) !important;
+  border: var(--fg-glass-border) !important;
+  box-shadow: var(--fg-glass-shadow) !important;
+  padding: 18px 22px 22px 22px !important;
+  transition: var(--fg-transition);
+  overflow: hidden;
 }
 
+#chart-panel:hover {
+  box-shadow: var(--fg-glass-shadow-hover) !important;
+}
+
+/* 헤더: 미니멀 글래스 타이틀 & 컨트롤 */
+#chart-header {
+  background: transparent !important;
+  border-bottom: var(--fg-glass-border-subtle) !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.chart-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-header-icon {
+  font-size: 17px;
+  filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.6));
+}
+
+#chart-title {
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.2px !important;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-theme="light"] #chart-title {
+  background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 패널 컨트롤 버튼 (피그마 스타일 원형/필 버튼) */
+.panel-ctrl-btn {
+  background: var(--fg-glass-btn-bg) !important;
+  border: var(--fg-glass-border) !important;
+  box-shadow: var(--fg-glass-specular) !important;
+  border-radius: var(--fg-pill-radius) !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 11px !important;
+  color: #cbd5e1 !important;
+  cursor: pointer;
+  transition: var(--fg-transition) !important;
+}
+
+html[data-theme="light"] .panel-ctrl-btn {
+  color: #475569 !important;
+}
+
+.panel-ctrl-btn:hover {
+  transform: translateY(-1px) scale(1.05);
+  border: var(--fg-glass-border-hover) !important;
+  color: #c084fc !important;
+}
+
+/* 그래프 캔버스 래퍼: 오직 그래프만 넓고 시원하게 표출 */
+#chart-wrapper {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 290px !important;
+  height: 330px !important;
+  max-height: 380px !important;
+  padding: 8px 4px !important;
+  display: block !important;
+}
+
+#chart-wrapper canvas {
+  max-height: 310px !important;
+  filter: drop-shadow(0 8px 24px rgba(147, 51, 234, 0.25));
+}
+
+/* 사형/테이블/설명 제외: 데이터 표는 완전히 숨김 처리 */
+#data-table-container,
+.chart-tab-group {
+  display: none !important;
+}
+
+/* 최대화 시 레이아웃 */
+#chart-panel.maximized {
+  border-radius: var(--fg-card-radius) !important;
+}
+
+#chart-panel.maximized #chart-wrapper {
+  min-height: calc(100vh - 180px) !important;
+  height: calc(100vh - 180px) !important;
+  max-height: calc(100vh - 180px) !important;
+}
+
+#chart-panel.maximized #chart-wrapper canvas {
+  max-height: calc(100vh - 200px) !important;
+}
+
+/* -----------------------------------------------------------------------------
+ * 3. 상단 글로벌 컨트롤 바 (Figma Glass Top Bar)
+ * ----------------------------------------------------------------------------- */
+#top-bar {
+  background: var(--fg-glass-panel-bg) !important;
+  backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  -webkit-backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  border-bottom: var(--fg-glass-border) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.3), var(--fg-glass-specular) !important;
+}
+
+/* 상단 바 버튼: 피그마 스타일 글래스 필/라운드 버튼 */
 .top-bar-right button {
   background: var(--fg-glass-btn-bg) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
   border: var(--fg-glass-border) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), var(--fg-glass-inner-specular) !important;
-  border-radius: var(--glass-radius-sm) !important;
-  transition: var(--glass-transition) !important;
+  box-shadow: var(--fg-glass-specular) !important;
+  border-radius: var(--fg-pill-radius) !important;
+  padding: 5px 12px !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  transition: var(--fg-transition) !important;
 }
 
 .top-bar-right button:hover {
   transform: translateY(-1.5px);
-  border: var(--fg-glass-border-highlight) !important;
-  box-shadow: var(--fg-glass-shadow-hover) !important;
-}
-
-.top-bar-right button:active {
-  transform: translateY(0.5px);
+  border: var(--fg-glass-border-hover) !important;
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35), var(--fg-glass-specular) !important;
+  color: #c084fc !important;
 }
 
 .topbar-style-wrap {
   background: var(--fg-glass-btn-bg) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
   border: var(--fg-glass-border) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), var(--fg-glass-inner-specular) !important;
-  border-radius: var(--glass-radius-sm) !important;
+  border-radius: var(--fg-pill-radius) !important;
+  box-shadow: var(--fg-glass-specular) !important;
+  padding: 3px 10px !important;
+}
+
+.topbar-ai-report-btn {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.35) 0%, rgba(79, 70, 229, 0.3) 100%) !important;
+  border: 1px solid rgba(192, 132, 252, 0.45) !important;
+  color: #e9d5ff !important;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.3), var(--fg-glass-specular) !important;
 }
 
 /* -----------------------------------------------------------------------------
- * 3. 독립 데이터 소스 카드 (Glass Upload Panel)
+ * 4. 데이터 소스 업로드 패널 (Figma Glass Upload Card)
  * ----------------------------------------------------------------------------- */
 .upload-card {
-  background: var(--fg-glass-bg) !important;
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
+  background: var(--fg-glass-card-bg) !important;
+  backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  -webkit-backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  border-radius: var(--fg-card-radius) !important;
   border: var(--fg-glass-border) !important;
   box-shadow: var(--fg-glass-shadow) !important;
-  border-radius: var(--glass-radius-lg) !important;
-  transition: var(--glass-transition) !important;
+  transition: var(--fg-transition);
 }
 
 .upload-card:hover {
   box-shadow: var(--fg-glass-shadow-hover) !important;
 }
 
-.upload-card-top {
-  border-bottom: var(--fg-glass-border-subtle) !important;
-  background: transparent !important;
-}
-
 .upload-btn {
   background: var(--fg-glass-btn-bg) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border: 1.5px dashed rgba(99, 102, 241, 0.45) !important;
-  box-shadow: var(--fg-glass-inner-specular) !important;
-  border-radius: var(--glass-radius-md) !important;
-  transition: var(--glass-transition) !important;
+  border: 1.5px dashed rgba(168, 85, 247, 0.45) !important;
+  border-radius: var(--fg-elem-radius) !important;
+  box-shadow: var(--fg-glass-specular) !important;
+  transition: var(--fg-transition) !important;
 }
 
 .upload-btn:hover {
   transform: translateY(-1.5px);
-  border-color: #6366f1 !important;
-  box-shadow: var(--fg-glass-shadow-hover) !important;
+  border-color: #a855f7 !important;
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.35) !important;
 }
 
 .upload-ai-quick-btn {
-  border-radius: var(--glass-radius-md) !important;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
-  transition: var(--glass-transition) !important;
+  border-radius: var(--fg-elem-radius) !important;
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4), var(--fg-glass-specular) !important;
+  transition: var(--fg-transition) !important;
 }
 
 .upload-ai-quick-btn:hover {
   transform: translateY(-1.5px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 26px rgba(147, 51, 234, 0.55), var(--fg-glass-specular) !important;
 }
 
 /* -----------------------------------------------------------------------------
- * 4. 우측 대시보드 메뉴 드로어 (Glass Accordion Drawer)
+ * 5. 우측 대시보드 메뉴 드로어 (Figma Glass Drawer & Accordion)
  * ----------------------------------------------------------------------------- */
 .menu-drawer {
-  background: var(--fg-glass-bg) !important;
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
+  background: var(--fg-glass-card-bg) !important;
+  backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  -webkit-backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) contrast(var(--fg-contrast)) !important;
+  border-radius: var(--fg-card-radius) !important;
   border: var(--fg-glass-border) !important;
   box-shadow: var(--fg-glass-shadow) !important;
-  border-radius: var(--glass-radius-lg) !important;
-  transition: var(--glass-transition);
 }
 
 .menu-header {
-  background: var(--fg-glass-header-bg) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border-bottom: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-inner-specular) !important;
-}
-
-.menu-nav-btn {
-  background: var(--fg-glass-btn-bg) !important;
-  border: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-inner-specular) !important;
-  border-radius: var(--glass-radius-sm) !important;
-  transition: var(--glass-transition) !important;
-}
-
-.menu-nav-btn:hover {
-  border: var(--fg-glass-border-highlight) !important;
-  box-shadow: var(--fg-glass-shadow-hover) !important;
+  background: transparent !important;
+  border-bottom: var(--fg-glass-border-subtle) !important;
 }
 
 .accordion-item {
-  background: var(--fg-glass-card-bg) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border: var(--fg-glass-border) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), var(--fg-glass-inner-specular) !important;
-  border-radius: var(--glass-radius-md) !important;
-  transition: var(--glass-transition) !important;
+  background: var(--fg-glass-btn-bg) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: var(--fg-glass-border-subtle) !important;
+  border-radius: var(--fg-elem-radius) !important;
+  box-shadow: var(--fg-glass-specular) !important;
+  transition: var(--fg-transition) !important;
 }
 
 .accordion-item.active {
-  border: var(--fg-glass-border-highlight) !important;
-  box-shadow: 0 8px 24px -4px rgba(99, 102, 241, 0.15), var(--fg-glass-inner-specular) !important;
+  border: var(--fg-glass-border-hover) !important;
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.2), var(--fg-glass-specular) !important;
 }
 
 /* -----------------------------------------------------------------------------
- * 5. 좌측 하단 2D 차트 & 데이터 테이블 뷰어 (Glass Analytics Panel)
- * ----------------------------------------------------------------------------- */
-#chart-panel {
-  background: var(--fg-glass-bg) !important;
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  border: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-shadow) !important;
-  border-radius: var(--glass-radius-lg) !important;
-  transition: var(--glass-transition);
-}
-
-#chart-header {
-  background: var(--fg-glass-header-bg) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border-bottom: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-inner-specular) !important;
-}
-
-.chart-tab-group {
-  background: rgba(0, 0, 0, 0.08) !important;
-  border: var(--fg-glass-border) !important;
-  border-radius: var(--glass-radius-sm) !important;
-}
-
-.chart-tab-btn.active {
-  background: var(--fg-glass-btn-bg) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08), var(--fg-glass-inner-specular) !important;
-}
-
-/* -----------------------------------------------------------------------------
- * 6. 하단 타임라인 플레이어 (Glass Timeline Dock)
+ * 6. 타임라인 독 & 툴팁 (Figma Glass Dock & Floating)
  * ----------------------------------------------------------------------------- */
 .time-player-panel {
-  background: var(--fg-glass-bg) !important;
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
+  background: var(--fg-glass-card-bg) !important;
+  backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--fg-blur-deep)) saturate(var(--fg-saturate)) !important;
+  border-radius: var(--fg-pill-radius) !important;
   border: var(--fg-glass-border) !important;
   box-shadow: var(--fg-glass-shadow) !important;
-  border-radius: var(--glass-radius-lg) !important;
 }
 
 .time-btn {
   background: var(--fg-glass-btn-bg) !important;
   border: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-inner-specular) !important;
-  border-radius: var(--glass-radius-sm) !important;
-  transition: var(--glass-transition) !important;
+  box-shadow: var(--fg-glass-specular) !important;
+  border-radius: var(--fg-pill-radius) !important;
+  transition: var(--fg-transition) !important;
 }
 
 .time-btn:hover {
-  border: var(--fg-glass-border-highlight) !important;
-  box-shadow: var(--fg-glass-shadow-hover) !important;
+  border: var(--fg-glass-border-hover) !important;
+  color: #c084fc !important;
 }
 
-/* -----------------------------------------------------------------------------
- * 7. 3D 플로팅 툴팁 & 알림 팝업 (Glass Floatables)
- * ----------------------------------------------------------------------------- */
 .tooltip-3d {
-  background: var(--fg-glass-bg) !important;
-  backdrop-filter: blur(18px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  background: var(--fg-glass-card-bg) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-radius: var(--fg-elem-radius) !important;
   border: var(--fg-glass-border) !important;
   box-shadow: var(--fg-glass-shadow) !important;
-  border-radius: var(--glass-radius-sm) !important;
-}
-
-.toast-popup {
-  background: var(--fg-glass-bg) !important;
-  backdrop-filter: blur(18px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
-  border: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-shadow) !important;
-  border-radius: var(--glass-radius-md) !important;
 }
 
 /* -----------------------------------------------------------------------------
- * 8. 모달 다이얼로그 (Glass Modals: AI Report, GPU Info, Usage Guide, Figma)
- * ----------------------------------------------------------------------------- */
-.modal-backdrop {
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  background: rgba(15, 23, 42, 0.45) !important;
-  transition: opacity 0.3s ease;
-}
-
-.modal-card {
-  background: var(--fg-glass-bg) !important;
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) contrast(var(--glass-contrast)) !important;
-  border: var(--fg-glass-border) !important;
-  box-shadow: 0 28px 64px -12px rgba(0, 0, 0, 0.5), 
-              0 8px 24px -4px rgba(0, 0, 0, 0.25), 
-              var(--fg-glass-inner-specular) !important;
-  border-radius: 20px !important;
-  overflow: hidden;
-}
-
-.modal-header {
-  background: var(--fg-glass-header-bg) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  border-bottom: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-inner-specular) !important;
-}
-
-.modal-close-btn {
-  background: var(--fg-glass-btn-bg) !important;
-  border: var(--fg-glass-border) !important;
-  box-shadow: var(--fg-glass-inner-specular) !important;
-  border-radius: 50% !important;
-  transition: var(--glass-transition) !important;
-}
-
-.modal-close-btn:hover {
-  transform: rotate(90deg) scale(1.1);
-  border: var(--fg-glass-border-highlight) !important;
-  box-shadow: var(--fg-glass-shadow-hover) !important;
-}
-
-/* -----------------------------------------------------------------------------
- * 9. 폼 컨트롤 & 인풋 (Glass Form Elements)
+ * 7. 폼 인풋 및 셀렉트 박스
  * ----------------------------------------------------------------------------- */
 select, 
 input[type="text"], 
 input[type="number"] {
-  background: var(--fg-glass-input-bg) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  background: var(--fg-glass-btn-bg) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   border: var(--fg-glass-border) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08) !important;
-  border-radius: var(--glass-radius-sm) !important;
-  transition: var(--glass-transition) !important;
+  border-radius: var(--fg-elem-radius) !important;
+  box-shadow: var(--fg-glass-specular) !important;
+  transition: var(--fg-transition) !important;
 }
 
 select:focus, 
 input[type="text"]:focus, 
 input[type="number"]:focus {
-  border: var(--fg-glass-border-highlight) !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+  border: var(--fg-glass-border-hover) !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3) !important;
   outline: none;
-}
-
-/* -----------------------------------------------------------------------------
- * 10. Figma Glass Effect Playground 전용 모달 & 툴바 버튼
- * ----------------------------------------------------------------------------- */
-.figma-glass-btn {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.2) 100%) !important;
-  border: 1px solid rgba(168, 85, 247, 0.45) !important;
-  color: #a855f7 !important;
-  font-weight: 700 !important;
-}
-
-html[data-theme="dark"] .figma-glass-btn {
-  color: #c084fc !important;
-  border: 1px solid rgba(192, 132, 252, 0.5) !important;
-}
-
-.figma-glass-btn:hover {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(168, 85, 247, 0.35) 100%) !important;
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Figma 모달 레이아웃 */
-.figma-glass-modal-card {
-  width: 92vw;
-  max-width: 980px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.figma-glass-modal-body {
-  padding: 16px 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.figma-glass-feature-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.glass-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 11.5px;
-  font-weight: 600;
-  background: var(--fg-glass-card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: var(--fg-glass-border);
-  box-shadow: var(--fg-glass-inner-specular);
-  color: inherit;
-  transition: var(--glass-transition);
-}
-
-.glass-chip:hover {
-  transform: translateY(-1px);
-  border: var(--fg-glass-border-highlight);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
-}
-
-.figma-iframe-wrapper {
-  position: relative;
-  width: 100%;
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: var(--fg-glass-shadow);
-  border: var(--fg-glass-border);
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.figma-iframe-wrapper iframe {
-  display: block;
-  width: 100%;
-  height: 520px;
-  border: none;
-}
-
-.figma-external-link-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: var(--glass-radius-sm);
-  background: var(--fg-glass-btn-bg);
-  border: var(--fg-glass-border);
-  box-shadow: var(--fg-glass-inner-specular);
-  color: #6366f1;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: var(--glass-transition);
-}
-
-html[data-theme="dark"] .figma-external-link-btn {
-  color: #a5b4fc;
-}
-
-.figma-external-link-btn:hover {
-  transform: translateY(-1px);
-  border: var(--fg-glass-border-highlight);
-  box-shadow: var(--fg-glass-shadow-hover);
-}
-
-.figma-glass-footer-desc {
-  font-size: 12px;
-  line-height: 1.5;
-  padding: 10px 14px;
-  border-radius: var(--glass-radius-md);
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  color: #6366f1;
-}
-
-html[data-theme="dark"] .figma-glass-footer-desc {
-  color: #c7d2fe;
-}
-
-/* 모바일 대응 */
-@media (max-width: 600px) {
-  .figma-glass-modal-card {
-    width: 96vw;
-    max-height: 94vh;
-  }
-  .figma-iframe-wrapper iframe {
-    height: 380px;
-  }
-  .figma-glass-feature-chips {
-    gap: 5px;
-  }
-  .glass-chip {
-    padding: 3px 8px;
-    font-size: 10.5px;
-  }
 }

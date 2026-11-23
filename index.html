@@ -92,7 +92,6 @@
             <button id="btn-toggle-timeline" title="시계열/다차원 타임슬라이더 플레이어"><span class="toolbar-icon" aria-hidden="true">⏳</span> 타임라인</button>
             <button id="btn-screenshot" title="현재 3D 화면 고화질 PNG 이미지로 저장"><span class="toolbar-icon" aria-hidden="true">📸</span> 캡처</button>
             <button id="btn-usage-guide" title="사용 방법 안내"><span class="toolbar-icon" aria-hidden="true">❔</span> 사용법</button>
-            <button id="btn-figma-glass" class="figma-glass-btn" title="Figma 공식 Glass Effect Playground (글래스 효과 가이드 & 인터랙티브 실습)"><span class="toolbar-icon" aria-hidden="true">🪟</span> Glass 가이드</button>
             <button id="btn-print-report" class="topbar-ai-report-btn" title="AI가 데이터를 정밀 분석하여 보고서를 자동으로 작성합니다">AI 자동 보고서</button>
             <button id="btn-fullscreen" title="전체화면"><span class="toolbar-icon" aria-hidden="true">⛶</span></button>
             <button id="btn-toggle-menu" class="menu-toggle-btn" title="대시보드 메뉴 열기/닫기"><span class="toolbar-icon" aria-hidden="true">☰</span> 메뉴</button>
@@ -502,30 +501,26 @@
     </aside>
 
     <!-- =======================================================
-         5. 좌측 하단 2D 차트 & 데이터 테이블 뷰어 패널
+         5. 좌측 하단 Figma Glass Effect 2D 분석 그래프 뷰어 (오직 그래프만 전면 표시)
          ======================================================= -->
-    <div id="chart-panel" style="display:none;">
+    <div id="chart-panel" class="figma-glass-chart-card" style="display:none;">
         <div id="chart-header">
-            <h3 id="chart-title">2D 보조 분석 차트 (2D Chart)</h3>
+            <div class="chart-header-left">
+                <span class="chart-header-icon" aria-hidden="true">📊</span>
+                <h3 id="chart-title">2D 분석 그래프</h3>
+            </div>
             <div class="chart-header-actions">
-                <div class="chart-tab-group" id="chart-tab-group">
-                    <button type="button" class="chart-tab-btn active" id="btn-tab-chart" title="2D 차트 보기">📊 차트</button>
-                    <button type="button" class="chart-tab-btn" id="btn-tab-table" title="데이터 표 보기">📄 표</button>
-                </div>
                 <button id="chart-maximize-btn" class="panel-ctrl-btn" title="확대 / Maximize">⛶</button>
                 <button id="chart-close-btn" class="panel-ctrl-btn close" title="닫기 / Close">✕</button>
             </div>
         </div>
-        <!-- Chart.js 캔버스 영역 -->
+        <!-- Chart.js 캔버스 영역 (설명/표 제외, 오직 그래프만 전면 표시) -->
         <div id="chart-wrapper">
             <canvas id="chart-2d"></canvas>
         </div>
-        <!-- 원본 데이터 행렬 및 다축 틀고정(Sticky) 테이블 -->
-        <div id="data-table-container">
-            <h4>📄 데이터 표 (Data Table) <span id="row-count"></span></h4>
-            <div id="data-table-scroll">
-                <table id="data-table"></table>
-            </div>
+        <!-- 원본 데이터 표 (요청에 따라 완전히 제외 처리) -->
+        <div id="data-table-container" style="display:none !important;">
+            <table id="data-table" style="display:none;"></table>
         </div>
     </div>
 
@@ -635,44 +630,6 @@
             <div class="usage-guide-actions">
                 <button type="button" id="btn-usage-guide-file" class="usage-guide-primary">📁 데이터 파일 선택</button>
                 <button type="button" id="btn-close-usage-guide-bottom" class="usage-guide-secondary">닫기</button>
-            </div>
-        </section>
-    </div>
-
-    <!-- =======================================================
-         Figma Glass Effect Playground 모달 (임베드 연동)
-         ======================================================= -->
-    <div id="figma-glass-modal" class="modal-backdrop figma-glass-modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="figma-glass-modal-title">
-        <section class="modal-card figma-glass-modal-card" tabindex="-1">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span class="modal-icon" aria-hidden="true">🪟</span>
-                    <div>
-                        <h3 id="figma-glass-modal-title">Figma Glass Effect Playground</h3>
-                        <p class="modal-subtitle">피그마 공식 글래스 효과(Light, Frost, Depth, Refraction, Dispersion) 가이드 & 인터랙티브 실습</p>
-                    </div>
-                </div>
-                <div class="modal-header-actions" style="display:flex; align-items:center; gap:8px;">
-                    <a href="https://www.figma.com/community/file/1528677656387260722" target="_blank" rel="noopener noreferrer" class="figma-external-link-btn" title="Figma Community 원본 파일 새 창에서 열기">
-                        ↗ Figma 원본 열기
-                    </a>
-                    <button type="button" id="btn-close-figma-glass" class="modal-close-btn" aria-label="Figma 모달 닫기" title="닫기">&times;</button>
-                </div>
-            </div>
-            <div class="modal-body figma-glass-modal-body">
-                <div class="figma-glass-feature-chips">
-                    <span class="glass-chip" title="빛의 방향과 모서리 하이라이트">💡 Light (조명/하이라이트)</span>
-                    <span class="glass-chip" title="유리 질감의 배경 흐림도">❄️ Frost (서리/블러)</span>
-                    <span class="glass-chip" title="입체적 두께와 3D 깊이감">🧊 Depth (깊이감)</span>
-                    <span class="glass-chip" title="배경 왜곡 및 반사 굴절">🔮 Refraction (굴절)</span>
-                    <span class="glass-chip" title="빛의 색수차 분산 스펙트럼">🌈 Dispersion (분산 광택)</span>
-                </div>
-                <div class="figma-iframe-wrapper">
-                    <iframe id="figma-embed-frame" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; width: 100%; height: 500px;" src="https://embed.figma.com/design/uTwP5WrFTbyx7NsDPpc387/Glass-effect-playground--%ED%95%9C%EA%B5%AD%EC%96%B4---Community-?node-id=9022-1079&code-node-id=9022-1079&embed-host=share" allowfullscreen loading="lazy"></iframe>
-                </div>
-                <div class="figma-glass-footer-desc">
-                    <span>✨ 대시보드의 상단 바, 데이터 소스 카드, 메뉴 드로어, 2D 분석 패널 등에 본 피그마 Glass Effect(글래스모피즘) 디자인 시스템이 적용되어 있습니다.</span>
-                </div>
             </div>
         </section>
     </div>

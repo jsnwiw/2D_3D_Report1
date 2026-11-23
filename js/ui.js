@@ -408,42 +408,6 @@ export function setupTopBarActions() {
         }
     });
 
-    // --- Figma Glass Effect Playground 모달 제어 ---
-    const figmaGlassModal = $('figma-glass-modal');
-    const btnFigmaGlass = $('btn-figma-glass');
-    const btnCloseFigmaGlass = $('btn-close-figma-glass');
-    let figmaGlassReturnFocus = null;
-
-    const closeFigmaGlass = () => {
-        if (!figmaGlassModal || figmaGlassModal.style.display === 'none') return;
-        figmaGlassModal.style.display = 'none';
-        figmaGlassModal.setAttribute('aria-hidden', 'true');
-        if (figmaGlassReturnFocus instanceof HTMLElement && figmaGlassReturnFocus.isConnected) {
-            figmaGlassReturnFocus.focus();
-        }
-        figmaGlassReturnFocus = null;
-    };
-
-    const openFigmaGlass = () => {
-        if (!figmaGlassModal) return;
-        figmaGlassReturnFocus = document.activeElement;
-        figmaGlassModal.style.display = 'flex';
-        figmaGlassModal.setAttribute('aria-hidden', 'false');
-        btnCloseFigmaGlass?.focus();
-    };
-
-    btnFigmaGlass?.addEventListener('click', openFigmaGlass);
-    btnCloseFigmaGlass?.addEventListener('click', closeFigmaGlass);
-    figmaGlassModal?.addEventListener('click', event => {
-        if (event.target === figmaGlassModal) closeFigmaGlass();
-    });
-    figmaGlassModal?.addEventListener('keydown', event => {
-        if (event.key === 'Escape') {
-            event.preventDefault();
-            closeFigmaGlass();
-        }
-    });
-
     btnToggleMenu?.addEventListener('click', () => {
         if (menuPanel) {
             const isOpen = menuPanel.classList.toggle('open');
