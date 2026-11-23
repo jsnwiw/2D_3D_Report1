@@ -1,0 +1,209 @@
+/* ==============================================================================
+ * [desktop.css] 컴퓨터 / PC 데스크톱 플랫폼 전용 스타일시트
+ * ============================================================================== */
+@import url('common.css');
+
+/* 데스크톱 전용 뷰포트 & 툴바 */
+#mobile-action-bar {
+    display: none !important;
+}
+.mobile-only {
+    display: none !important;
+}
+.desktop-only {
+    display: inherit;
+}
+
+/* 데스크톱 상단 바 */
+#top-bar {
+    height: 52px;
+    padding: 0 16px;
+}
+.top-bar-left h1 {
+    font-size: 15px;
+}
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ==============================================================================
+   태블릿 & 대형 모니터 화면 크기 지능형 자동 최적화 (@media Adaptive Layout)
+   ============================================================================== */
+
+/* 1. 대형 모니터 및 4K/QHD 와이드 디스플레이 (1440px 이상) */
+@media (min-width: 1440px) {
+    #top-bar {
+        height: 56px;
+        padding: 0 24px;
+    }
+    .top-bar-left h1 {
+        font-size: 17px;
+    }
+    .top-bar-right button {
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+    .upload-card {
+        width: 390px;
+        top: 68px;
+        left: 20px;
+    }
+    .menu-drawer {
+        width: 380px;
+        top: 68px;
+        right: 20px;
+        bottom: 20px;
+    }
+    #chart-panel {
+        width: 540px;
+        left: 20px;
+        bottom: 20px;
+        max-height: calc(100vh - 220px);
+    }
+    #chart-panel.maximized {
+        width: calc(100vw - 440px);
+        max-height: calc(100vh - 100px);
+    }
+    #chart-wrapper {
+        min-height: 250px;
+        max-height: 320px;
+    }
+    #chart-wrapper canvas {
+        max-height: 300px;
+    }
+    #data-table-scroll {
+        max-height: 220px;
+    }
+}
+
+/* 4K 초고해상도 모니터 (2560px 이상) */
+@media (min-width: 2560px) {
+    #chart-panel {
+        width: 620px;
+        max-height: calc(100vh - 260px);
+    }
+    #chart-wrapper {
+        min-height: 300px;
+        max-height: 380px;
+    }
+    #chart-wrapper canvas {
+        max-height: 360px;
+    }
+    .menu-drawer {
+        width: 420px;
+    }
+}
+
+/* 2. 일반 노트북 및 데스크탑 모니터 (1025px ~ 1439px) */
+@media (min-width: 1025px) and (max-width: 1439px) {
+    #chart-panel {
+        width: 460px;
+        max-height: calc(100vh - 260px);
+    }
+    .menu-drawer {
+        width: 350px;
+    }
+}
+
+/* 3. 태블릿 화면 (768px ~ 1024px) - 아이패드, 갤럭시탭 등 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    #top-bar {
+        height: 52px;
+        padding: 0 14px;
+    }
+    .top-bar-left h1 {
+        font-size: 14.5px;
+    }
+    .upload-card {
+        width: 310px;
+        top: 60px;
+        left: 14px;
+    }
+    .menu-drawer {
+        width: 320px;
+        top: 60px;
+        right: 14px;
+        bottom: 14px;
+    }
+    /* 태블릿 가로: 차트 패널이 3D를 너무 가리지 않도록 적정 너비 유지 */
+    #chart-panel {
+        width: 380px;
+        max-width: calc(100vw - 360px);
+        left: 14px;
+        bottom: 14px;
+        max-height: calc(100vh - 280px);
+    }
+    /* 태블릿 세로(Portrait) 모드일 때 자동 도킹 레이아웃 */
+    body.screen-portrait #chart-panel {
+        width: calc(100vw - 28px);
+        max-width: none;
+        left: 14px;
+        bottom: 14px;
+        max-height: 40vh;
+    }
+    body.screen-portrait .upload-card {
+        width: calc(100vw - 28px);
+    }
+}
+
+/* 4. 소형 태블릿 및 모바일 (768px 이하) */
+@media (max-width: 768px) {
+    #top-bar { height: 48px; padding: 0 10px; }
+    .top-bar-left h1 { font-size: 13px; }
+    .status { display: none; } /* 모바일/소형화면 공간 확보 */
+    
+    .upload-card {
+        width: calc(100vw - 24px);
+        left: 12px; top: 54px;
+        padding: 10px 12px;
+    }
+
+    .menu-drawer {
+        overflow: hidden !important;
+        position: fixed;
+        top: 0; right: 0;
+        width: 86vw; max-width: 360px;
+        height: 100vh; height: 100dvh;
+        max-height: 100vh; max-height: 100dvh;
+        border-radius: 0;
+        z-index: 55;
+        box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+    }
+    .menu-content {
+        flex: 1 1 0px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        max-height: none;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain;
+        touch-action: pan-y !important;
+        padding-bottom: calc(30px + env(safe-area-inset-bottom, 20px));
+    }
+
+    #chart-panel {
+        position: fixed;
+        width: calc(100vw - 24px);
+        left: 12px; bottom: 10px;
+        max-height: 42vh;
+        z-index: 25;
+    }
+    #chart-panel.maximized {
+        width: calc(100vw - 24px);
+        max-height: 75vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-bar-right button:not(.menu-toggle-btn):not(#btn-reset-camera):not(#btn-auto-rotate) {
+        display: none; /* 핵심 버튼만 표시 */
+    }
+    .upload-btn-group {
+        flex-direction: column; gap: 6px;
+    }
+}
