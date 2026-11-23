@@ -1,22 +1,23 @@
 {
-"screenshots": [
+"display_override": ["window-controls-overlay"], 
+  "screenshots": [
   {
     "src": "https://www.pwabuilder.com/assets/screenshots/screen1.png",
     "sizes": "2880x1800",
     "type": "image/png",
-    "description": "PWABuilder Home Screen"
+    "description": "PWABuilder 메인 화면"
   },
   {
     "src": "https://www.pwabuilder.com/assets/screenshots/screen2.png",
-    "sizes": "2880/1800",
+    "sizes": "2880x1800",
     "type": "image/png",
-    "description": "PWABuilder Report Card"
+    "description": "PWABuilder 보고서 카드"
   },
   {
     "src": "https://www.pwabuilder.com/assets/screenshots/screen3.png",
     "sizes": "2880x1800",
     "type": "image/png",
-    "description": "Manifest information on the Report Card"
+    "description": "보고서 카드의 매니페스트 정보"
   }
 ], 
   "name": "3D 데이터 시각화 대시보드",
@@ -28,6 +29,21 @@
   "orientation": "any",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
+  "shortcuts": [
+    {
+      "name": "Open Dashboard",
+      "short_name": "Dashboard",
+      "description": "3D 데이터 시각화 대시보드 열기",
+      "url": "./index.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+dashboard",
+      "url": "./index.html?url=%s"
+    }
+  ],
   "icons": [
     {
       "src": "icon-192.png",
