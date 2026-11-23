@@ -3,25 +3,21 @@
  * ============================================================================== */
 @import url('common.css');
 
-/* 모바일 전용 뷰포트 & 툴바 */
-.desktop-only {
-    display: none !important;
-}
-.mobile-only {
-    display: inherit;
-}
-.floating-3d-toolbar {
-    display: none !important;
-}
-
-/* ===============================
-    Mobile responsive adjustments
-    =============================== */
+/* 모바일 전용 뷰포트 & 툴바 (기본값) */
 #mobile-action-bar {
     display: none;
 }
 
 @media (max-width: 600px) {
+    .desktop-only {
+        display: none !important;
+    }
+    .mobile-only {
+        display: inherit;
+    }
+    .floating-3d-toolbar {
+        display: none !important;
+    }
     #top-bar {
         top: 0;
         height: calc(50px + env(safe-area-inset-top, 0px));

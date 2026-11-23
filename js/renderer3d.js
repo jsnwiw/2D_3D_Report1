@@ -33,8 +33,25 @@ export async function initThreeScene() {
     if (!container) return;
 
     appState.scene = new THREE.Scene();
-    appState.scene.background = new THREE.Color(0xf1f5f9);
-    appState.scene.fog = new THREE.FogExp2(0xf1f5f9, 0.015);
+    const isDarkInit = document.documentElement.getAttribute('data-theme') === 'dark';
+    const initBgHex = isDarkInit ? 0x0f172a : 0xf1f5f9;
+    appState.scene.background = new THREE.Color(initBgHex);
+    appState.scene.fog = new THREE.FogExp2(initBgHex, 0.015);
+    const bgColorInput = $('bg-color');
+    if (bgColorInput) bgColorInput.value = isDarkInit ? '#0f172a' : '#f1f5f9';
+
+    // 다크 / 라이트 모드 전환 시 3D 씬 배경색 및 안개 동기화
+    window.addEventListener('themechange', (e) => {
+        const theme = e.detail?.theme || document.documentElement.getAttribute('data-theme') || 'light';
+        const isDark = theme === 'dark';
+        const newBgHex = isDark ? 0x0f172a : 0xf1f5f9;
+        if (appState.scene) {
+            appState.scene.background = new THREE.Color(newBgHex);
+            if (appState.scene.fog) appState.scene.fog.color = new THREE.Color(newBgHex);
+        }
+        const bgInput = $('bg-color');
+        if (bgInput) bgInput.value = isDark ? '#0f172a' : '#f1f5f9';
+    });
 
     appState.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
     appState.camera.position.set(0, 10, 20);

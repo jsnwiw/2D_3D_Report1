@@ -55,6 +55,7 @@
         top: 68px;
         right: 20px;
         bottom: 20px;
+        max-height: calc(100dvh - 88px);
     }
     #chart-panel {
         width: 540px;
@@ -104,6 +105,10 @@
     }
     .menu-drawer {
         width: 350px;
+        top: 60px;
+        right: 16px;
+        bottom: 16px;
+        max-height: calc(100dvh - 76px);
     }
 }
 
@@ -126,6 +131,7 @@
         top: 60px;
         right: 14px;
         bottom: 14px;
+        max-height: calc(100dvh - 74px);
     }
     /* 태블릿 가로: 차트 패널이 3D를 너무 가리지 않도록 적정 너비 유지 */
     #chart-panel {
@@ -161,12 +167,13 @@
     }
 
     .menu-drawer {
-        overflow: hidden !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch; /* enable smooth scroll on mobile */
         position: fixed;
         top: 0; right: 0;
         width: 86vw; max-width: 360px;
-        height: 100vh; height: 100dvh;
-        max-height: 100vh; max-height: 100dvh;
+        height: 100dvh;
+        max-height: 100dvh;
         border-radius: 0;
         z-index: 55;
         box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);

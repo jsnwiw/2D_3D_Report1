@@ -549,17 +549,18 @@ export function setupLightingControls() {
     });
 
     btnResetLighting?.addEventListener('click', () => {
-        const defaultBg = '#f1f5f9';
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const defaultBg = isDark ? '#0f172a' : '#f1f5f9';
         if (appState.scene) {
             appState.scene.background = new THREE.Color(defaultBg);
             if (appState.scene.fog) appState.scene.fog.color = new THREE.Color(defaultBg);
         }
-        if (appState.ambientLight) appState.ambientLight.intensity = 0.7;
+        if (appState.ambientLight) appState.ambientLight.intensity = isDark ? 0.9 : 0.7;
         if (appState.dirLight) appState.dirLight.intensity = 0.9;
         if (appState.renderer) appState.renderer.toneMappingExposure = 1.1;
 
         if (bgColor) bgColor.value = defaultBg;
-        if (ambientIntensity) ambientIntensity.value = '0.7';
+        if (ambientIntensity) ambientIntensity.value = isDark ? '0.9' : '0.7';
         if (dirIntensity) dirIntensity.value = '0.9';
         if (exposureIntensity) exposureIntensity.value = '1.1';
 

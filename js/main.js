@@ -282,8 +282,16 @@ function bindFilterAndOptionEvents() {
         if (appState.parsedData) applyVisualization();
     });
     customColorPicker?.addEventListener('input', (e) => {
-        if (customColorCode) customColorCode.textContent = e.target.value.toUpperCase();
+        if (customColorCode) customColorCode.value = e.target.value.toUpperCase();
         if (appState.parsedData) applyVisualization();
+    });
+    customColorCode?.addEventListener('input', (e) => {
+        let val = e.target.value.trim();
+        if (!val.startsWith('#')) val = '#' + val;
+        if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+            if (customColorPicker) customColorPicker.value = val;
+            if (appState.parsedData) applyVisualization();
+        }
     });
 }
 

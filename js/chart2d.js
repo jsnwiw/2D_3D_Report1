@@ -159,20 +159,35 @@ export function render2DChart() {
 
 function chartOptions(type, xLabel, yLabel) {
     const isPie = ['pie', 'doughnut', 'polarArea'].includes(type);
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#cbd5e1' : '#64748b';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    const tooltipBg = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+    const tooltipTitle = isDark ? '#a5b4fc' : '#4338ca';
+    const tooltipBody = isDark ? '#f1f5f9' : '#1e293b';
+    const tooltipBorder = isDark ? 'rgba(99, 102, 241, 0.4)' : '#cbd5e1';
+
     return {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 600, easing: 'easeOutQuart' },
         plugins: {
-            legend: { display: isPie, position: 'right', labels: { color: '#334155', font: { size: 10 }, padding: 6 } },
-            tooltip: { backgroundColor: 'rgba(255, 255, 255, 0.95)', titleColor: '#4338ca', bodyColor: '#1e293b', borderColor: '#cbd5e1', borderWidth: 1, padding: 10, cornerRadius: 8 }
+            legend: { display: isPie, position: 'right', labels: { color: isDark ? '#f1f5f9' : '#334155', font: { size: 10 }, padding: 6 } },
+            tooltip: { backgroundColor: tooltipBg, titleColor: tooltipTitle, bodyColor: tooltipBody, borderColor: tooltipBorder, borderWidth: 1, padding: 10, cornerRadius: 8 }
         },
         scales: isPie ? {} : {
-            x: { title: { display: true, text: xLabel, color: '#64748b', font: { size: 11 } }, ticks: { color: '#64748b', maxRotation: 45, font: { size: 9 } }, grid: { color: '#f1f5f9' } },
-            y: { title: { display: true, text: yLabel, color: '#64748b', font: { size: 11 } }, ticks: { color: '#64748b', font: { size: 9 } }, grid: { color: '#f1f5f9' }, beginAtZero: true }
+            x: { title: { display: true, text: xLabel, color: textColor, font: { size: 11 } }, ticks: { color: textColor, maxRotation: 45, font: { size: 9 } }, grid: { color: gridColor } },
+            y: { title: { display: true, text: yLabel, color: textColor, font: { size: 11 } }, ticks: { color: textColor, font: { size: 9 } }, grid: { color: gridColor }, beginAtZero: true }
         }
     };
 }
+
+// 테마 변경 시 2D 차트 스타일 즉시 갱신
+window.addEventListener('themechange', () => {
+    if (appState.parsedData && appState.chart2d) {
+        render2DChart();
+    }
+});
 
 export function renderDataTable(data, highlightRow = -1) {
     const table = $('data-table');

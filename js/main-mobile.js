@@ -279,7 +279,7 @@ function bindFilterAndOptionEvents() {
         if (appState.parsedData) applyVisualization();
     });
     customColorPicker?.addEventListener('input', (e) => {
-        if (customColorCode) customColorCode.textContent = e.target.value.toUpperCase();
+        if (customColorCode) customColorCode.value = e.target.value.toUpperCase();
         if (appState.parsedData) applyVisualization();
     });
 }

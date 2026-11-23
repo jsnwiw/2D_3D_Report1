@@ -1,82 +1,211 @@
 /* =============================================================================
- * Lide Light Board 테마 (기본 라이트 모드)
+ * [lide-light-board.css] 기존 UI 시스템과 완벽 호환되는 인디고/슬레이트 라이트 모드 테마
  * ------------------------------------------------------------------------- */
-:root {
-  --db-bg:        #f8fafc;               /* 메인 배경 – Slate‑50 */
-  --db-bg-panel:  #e2e8f0;               /* 사이드바·패널 배경 – Slate‑200 */
-  --db-text:      #1e293b;               /* 기본 텍스트 – Slate‑800 */
-  --db-primary:   #2563eb;               /* 강조 색 – Blue‑600 */
-  --db-accent:    #d946ef;               /* 포인트 색 – Pink‑600 */
-  --db-border:    rgba(30,41,59,0.1);    /* 얇은 보더 */
-  --db-shadow:    rgba(0,0,0,0.15);      /* 그림자 */
+html[data-theme="light"] {
+  --db-bg: #f8fafc;
+  --db-bg-panel: rgba(255, 255, 255, 0.95);
+  --db-bg-card: rgba(241, 245, 249, 0.85);
+  --db-text: #0f172a;
+  --db-text-muted: #64748b;
+  --db-primary: #4f46e5;
+  --db-primary-light: #6366f1;
+  --db-border: rgba(99, 102, 241, 0.22);
+  --db-border-hover: rgba(99, 102, 241, 0.45);
+  --db-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
 }
 
-/* 전체 페이지 배경·텍스트 */
-body, html {
+/* 전체 페이지 배경 및 기본 텍스트 */
+html[data-theme="light"] body,
+html[data-theme="light"] {
   background: var(--db-bg);
+  color: #334155;
+}
+
+/* 상단 글로벌 툴바 */
+html[data-theme="light"] #top-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--db-border);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+}
+
+html[data-theme="light"] .top-bar-left h1 {
   color: var(--db-text);
 }
 
-/* 사이드바 / 메뉴 드로어 */
-.menu-drawer,
-#menu-panel {
-  background: var(--db-bg-panel);
-  color: var(--db-text);
-  border-right: 1px solid var(--db-border);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.menu-drawer a,
-#menu-panel a {
-  color: var(--db-text);
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  display: block;
-  transition: background 0.2s, color 0.2s;
-}
-.menu-drawer a:hover,
-#menu-panel a:hover {
-  background: rgba(0,0,0,0.05);
-  color: var(--db-primary);
-}
-
-.menu-toggle-btn,
-.platform-switch-btn {
-  background: transparent;
-  border: none;
-  color: var(--db-text);
-}
-.menu-toggle-btn:hover,
-.platform-switch-btn:hover {
-  color: var(--db-primary);
-}
-
-.card,
-.panel {
-  background: rgba(255,255,255,0.8);
+/* 상단 바 버튼 그룹 */
+html[data-theme="light"] .top-bar-right button {
+  background: rgba(241, 245, 249, 0.92);
   border: 1px solid var(--db-border);
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 4px 12px var(--db-shadow);
+  color: #334155;
 }
 
-.menu-drawer::-webkit-scrollbar,
-#menu-panel::-webkit-scrollbar {
-  width: 8px;
-}
-.menu-drawer::-webkit-scrollbar-thumb,
-#menu-panel::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
+html[data-theme="light"] .top-bar-right button:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: var(--db-primary-light);
+  color: var(--db-primary);
 }
 
-/* 라이트 모드에서는 애니메이션 필요 없지만 동일하게 */
-@keyframes db-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* 3D 형태 즉시 전환 셀렉터 */
+html[data-theme="light"] .topbar-style-wrap {
+  background: rgba(241, 245, 249, 0.95);
+  border: 1px solid var(--db-border-hover);
 }
-.menu-drawer,
-#menu-panel {
-  animation: db-fade-in 0.25s ease-out;
+
+html[data-theme="light"] .topbar-style-label {
+  color: var(--db-primary);
+}
+
+html[data-theme="light"] .topbar-style-select {
+  color: var(--db-text);
+}
+
+html[data-theme="light"] .topbar-style-select option {
+  background: #ffffff;
+  color: var(--db-text);
+}
+
+/* 데이터 소스 업로드 패널 */
+html[data-theme="light"] .upload-card {
+  background: var(--db-bg-panel);
+  border: 1px solid var(--db-border);
+  box-shadow: var(--db-shadow);
+  color: var(--db-text);
+}
+
+html[data-theme="light"] .upload-card-top {
+  color: var(--db-text);
+}
+
+html[data-theme="light"] .upload-badge {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--db-primary);
+  border: 1px solid var(--db-border);
+}
+
+html[data-theme="light"] .file-name-text {
+  color: var(--db-text-muted);
+}
+
+html[data-theme="light"] .upload-btn {
+  background: rgba(241, 245, 249, 0.95);
+  border: 1px dashed rgba(99, 102, 241, 0.4);
+  color: #334155;
+}
+
+html[data-theme="light"] .upload-btn:hover {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: var(--db-primary);
+  color: var(--db-primary);
+}
+
+/* 우측 사이드바 대시보드 메뉴 드로어 */
+html[data-theme="light"] .menu-drawer {
+  background: var(--db-bg-panel);
+  border: 1px solid var(--db-border);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+  color: var(--db-text);
+}
+
+html[data-theme="light"] .menu-header {
+  background: rgba(241, 245, 249, 0.92);
+  border-bottom: 1px solid var(--db-border);
+}
+
+html[data-theme="light"] .menu-header-left h3 {
+  color: var(--db-text);
+}
+
+html[data-theme="light"] .menu-nav-btn {
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid var(--db-border);
+  color: var(--db-primary);
+}
+
+html[data-theme="light"] .menu-nav-btn:hover {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--db-primary);
+}
+
+/* 사이드바 아코디언 컴포넌트 */
+html[data-theme="light"] .accordion-item {
+  background: var(--db-bg-card);
+  border: 1px solid var(--db-border);
+}
+
+html[data-theme="light"] .accordion-item.active {
+  background: #ffffff;
+  border-color: var(--db-border-hover);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme="light"] .accordion-header {
+  color: var(--db-text);
+}
+
+html[data-theme="light"] .accordion-body {
+  color: #334155;
+}
+
+/* 좌측 2D 차트 & 데이터 테이블 패널 */
+html[data-theme="light"] #chart-panel {
+  background: var(--db-bg-panel);
+  border: 1px solid var(--db-border);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] #chart-header {
+  background: rgba(241, 245, 249, 0.92);
+  border-bottom: 1px solid var(--db-border);
+}
+
+html[data-theme="light"] #chart-header h3 {
+  color: var(--db-text);
+}
+
+html[data-theme="light"] #data-table-container {
+  background: #ffffff;
+}
+
+html[data-theme="light"] #data-table th {
+  background: #f1f5f9;
+  color: #334155;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+html[data-theme="light"] #data-table td {
+  border-bottom: 1px solid #e2e8f0;
+  color: var(--db-text);
+}
+
+/* 3D 실시간 툴팁 */
+html[data-theme="light"] .tooltip-3d {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--db-border-hover);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+}
+
+html[data-theme="light"] #tooltip-name {
+  color: var(--db-primary);
+}
+
+html[data-theme="light"] #tooltip-value {
+  color: var(--db-text);
+}
+
+/* 하단 타임라인 플레이어 */
+html[data-theme="light"] #timeline-player-bar {
+  background: var(--db-bg-panel);
+  border: 1px solid var(--db-border);
+  box-shadow: var(--db-shadow);
+  color: var(--db-text);
+}
+
+/* 폼 요소 통일 */
+html[data-theme="light"] select,
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="number"],
+html[data-theme="light"] input[type="range"] {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: var(--db-text);
 }
