@@ -12,3 +12,12 @@
 @import url('css/common.css');
 @import url('css/desktop.css');
 @import url('css/mobile.css');
+
+/* 라이트·다크 테마 자동 적용 */
+@media (prefers-color-scheme: dark) {
+  @import url('css/lide-dark-board.css');
+}
+@media (prefers-color-scheme: light) {
+  @import url('css/lide-light-board.css');
+}
+

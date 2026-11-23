@@ -1,0 +1,82 @@
+/* =============================================================================
+ * Lide Light Board 테마 (기본 라이트 모드)
+ * ------------------------------------------------------------------------- */
+:root {
+  --db-bg:        #f8fafc;               /* 메인 배경 – Slate‑50 */
+  --db-bg-panel:  #e2e8f0;               /* 사이드바·패널 배경 – Slate‑200 */
+  --db-text:      #1e293b;               /* 기본 텍스트 – Slate‑800 */
+  --db-primary:   #2563eb;               /* 강조 색 – Blue‑600 */
+  --db-accent:    #d946ef;               /* 포인트 색 – Pink‑600 */
+  --db-border:    rgba(30,41,59,0.1);    /* 얇은 보더 */
+  --db-shadow:    rgba(0,0,0,0.15);      /* 그림자 */
+}
+
+/* 전체 페이지 배경·텍스트 */
+body, html {
+  background: var(--db-bg);
+  color: var(--db-text);
+}
+
+/* 사이드바 / 메뉴 드로어 */
+.menu-drawer,
+#menu-panel {
+  background: var(--db-bg-panel);
+  color: var(--db-text);
+  border-right: 1px solid var(--db-border);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.menu-drawer a,
+#menu-panel a {
+  color: var(--db-text);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  display: block;
+  transition: background 0.2s, color 0.2s;
+}
+.menu-drawer a:hover,
+#menu-panel a:hover {
+  background: rgba(0,0,0,0.05);
+  color: var(--db-primary);
+}
+
+.menu-toggle-btn,
+.platform-switch-btn {
+  background: transparent;
+  border: none;
+  color: var(--db-text);
+}
+.menu-toggle-btn:hover,
+.platform-switch-btn:hover {
+  color: var(--db-primary);
+}
+
+.card,
+.panel {
+  background: rgba(255,255,255,0.8);
+  border: 1px solid var(--db-border);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px var(--db-shadow);
+}
+
+.menu-drawer::-webkit-scrollbar,
+#menu-panel::-webkit-scrollbar {
+  width: 8px;
+}
+.menu-drawer::-webkit-scrollbar-thumb,
+#menu-panel::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+/* 라이트 모드에서는 애니메이션 필요 없지만 동일하게 */
+@keyframes db-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.menu-drawer,
+#menu-panel {
+  animation: db-fade-in 0.25s ease-out;
+}
