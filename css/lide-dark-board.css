@@ -1,0 +1,49 @@
+/* =============================================================================
+ * Lide Dark Board 테마 (다크 모드)
+ * ------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  --db-bg:        #0f172a;               /* 메인 배경 – Slate‑900 */
+  --db-bg-panel:  #1e293b;               /* 사이드바·패널 배경 – Slate‑800 */
+  --db-text:      #f1f5f9;               /* 기본 텍스트 – Slate‑100 */
+  --db-primary:   #60a5fa;               /* 강조 색 – Blue‑400 */
+  --db-accent:    #f472b6;               /* 포인트 색 – Pink‑400 */
+  --db-border:    rgba(255,255,255,0.1); /* 얇은 보더 */
+  --db-shadow:    rgba(0,0,0,0.4);       /* 그림자 */
+}
+
+[data-theme="dark"] body, [data-theme="dark"] html {
+  background: var(--db-bg);
+  color: var(--db-text);
+}
+
+[data-theme="dark"] .menu-drawer,
+[data-theme="dark"] #menu-panel {
+  background: var(--db-bg-panel);
+  color: var(--db-text);
+  border-right: 1px solid var(--db-border);
+}
+
+[data-theme="dark"] .menu-drawer a,
+[data-theme="dark"] #menu-panel a {
+  color: var(--db-text);
+}
+
+[data-theme="dark"] .menu-drawer a:hover,
+[data-theme="dark"] #menu-panel a:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--db-primary);
+}
+
+[data-theme="dark"] .menu-toggle-btn,
+[data-theme="dark"] .platform-switch-btn {
+  background: transparent;
+  border: none;
+  color: var(--db-text);
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .panel {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--db-border);
+  box-shadow: 0 4px 12px var(--db-shadow);
+}
