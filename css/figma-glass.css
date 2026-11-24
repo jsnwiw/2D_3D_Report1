@@ -2570,6 +2570,96 @@ html[data-theme="dark"] .reset-lighting-btn:hover {
   border-color: #c084fc !important;
 }
 
+/* =============================================================================
+ * 15. 저사양 렉 방지 최적화 버튼 및 컨트롤 스타일링
+ * ============================================================================= */
+
+/* 상단 툴바 저사양 토글 버튼 */
+.lowspec-toggle-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  transition: all 0.24s ease !important;
+  cursor: pointer !important;
+}
+
+html[data-theme="light"] .lowspec-toggle-btn.active {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.35) !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="dark"] .lowspec-toggle-btn.active {
+  background: rgba(16, 185, 129, 0.25) !important;
+  color: #34d399 !important;
+  border-color: #34d399 !important;
+  box-shadow: 0 0 16px rgba(52, 211, 153, 0.45) !important;
+  font-weight: 800 !important;
+}
+
+/* 저사양 2D 카드 액션 버튼 */
+.lowspec-action-btn {
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  border: 1px solid transparent !important;
+}
+
+html[data-theme="light"] .lowspec-action-btn {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3) !important;
+}
+
+html[data-theme="light"] .lowspec-action-btn:hover {
+  background: #4338ca !important;
+}
+
+html[data-theme="dark"] .lowspec-action-btn {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4) !important;
+}
+
+html[data-theme="dark"] .lowspec-action-btn:hover {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1) !important;
+}
+
+/* 사이드바 성능 팁 배너 */
+.lowspec-perf-tip {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+html[data-theme="light"] .lowspec-perf-tip {
+  background: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+  color: #065f46 !important;
+}
+
+html[data-theme="light"] .lowspec-perf-tip strong {
+  color: #047857 !important;
+}
+
+html[data-theme="dark"] .lowspec-perf-tip {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border: 1px solid rgba(52, 211, 153, 0.35) !important;
+  color: #d1fae5 !important;
+}
+
+html[data-theme="dark"] .lowspec-perf-tip strong {
+  color: #34d399 !important;
+}
+
+
 
 
 

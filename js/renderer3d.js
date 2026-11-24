@@ -199,8 +199,9 @@ export function handleAdaptiveResize() {
     }
     appState.camera.updateProjectionMatrix();
 
-    // 2. 모니터 해상도 및 고주사율/고밀도 DPR 자동 최적화
-    const maxDpr = width > 2000 ? 1.5 : (width > 1200 ? 2 : Math.min(window.devicePixelRatio || 1, 2));
+    // 2. 모니터 해상도 및 고주사율/고밀도 DPR 자동 최적화 (저사양 모드 시 1.0으로 제한하여 GPU 부하 70% 감소)
+    const baseDpr = width > 2000 ? 1.5 : (width > 1200 ? 2 : Math.min(window.devicePixelRatio || 1, 2));
+    const maxDpr = appState.lowSpecMode ? Math.min(baseDpr, 1.0) : baseDpr;
     appState.renderer.setPixelRatio(maxDpr);
     appState.renderer.setSize(width, height);
 
@@ -425,7 +426,7 @@ function renderColumns(labels, values, maxVal, minVal, maxH, style) {
         const color = getThemeColor(idx, count);
 
         let geo;
-        if (style === 'cylinder') geo = new THREE.CylinderGeometry(0.45, 0.45, h, 24);
+        if (style === 'cylinder') geo = new THREE.CylinderGeometry(0.45, 0.45, h, appState.lowSpecMode ? 12 : 24);
         else if (style === 'pyramid') geo = new THREE.ConeGeometry(0.65, h, 4);
         else geo = new THREE.BoxGeometry(0.75, h, 0.75);
 
@@ -469,7 +470,14 @@ function renderPieOrDonut(labels, values, maxVal, isDonut) {
             shape.lineTo(0, 0);
         }
 
-        const extrudeSettings = { depth: h, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.08, bevelThickness: 0.08 };
+        const extrudeSettings = {
+            depth: h,
+            bevelEnabled: !appState.lowSpecMode,
+            bevelSegments: appState.lowSpecMode ? 1 : 3,
+            steps: 1,
+            bevelSize: 0.08,
+            bevelThickness: 0.08
+        };
         const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
         geo.rotateX(Math.PI / 2);
 
@@ -503,7 +511,7 @@ function renderScatter(labels, values, maxVal, maxH) {
         const z = Math.sin(angle) * r;
         const color = getThemeColor(idx, count);
 
-        const geo = new THREE.SphereGeometry(0.4, 20, 20);
+        const geo = new THREE.SphereGeometry(0.4, appState.lowSpecMode ? 10 : 20, appState.lowSpecMode ? 10 : 20);
         const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 });
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(x, h, z);
@@ -536,7 +544,7 @@ function renderTubeLine(labels, values, maxVal, maxH) {
 
         // 데이터 노드 스피어
         const color = getThemeColor(idx, count);
-        const nodeGeo = new THREE.SphereGeometry(0.35, 16, 16);
+        const nodeGeo = new THREE.SphereGeometry(0.35, appState.lowSpecMode ? 8 : 16, appState.lowSpecMode ? 8 : 16);
         const nodeMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 });
         const node = new THREE.Mesh(nodeGeo, nodeMat);
         node.position.set(x, h, 0);
@@ -549,7 +557,9 @@ function renderTubeLine(labels, values, maxVal, maxH) {
 
     if (points.length >= 2) {
         const curve = new THREE.CatmullRomCurve3(points);
-        const tubeGeo = new THREE.TubeGeometry(curve, points.length * 8, 0.15, 12, false);
+        const tubeSegments = points.length * (appState.lowSpecMode ? 4 : 8);
+        const radialSegments = appState.lowSpecMode ? 6 : 12;
+        const tubeGeo = new THREE.TubeGeometry(curve, tubeSegments, 0.15, radialSegments, false);
         const tubeMat = new THREE.MeshStandardMaterial({ color: 0x6366f1, roughness: 0.3, metalness: 0.3 });
         const tubeMesh = new THREE.Mesh(tubeGeo, tubeMat);
         appState.scene.add(tubeMesh);
@@ -573,7 +583,14 @@ function renderAreaSurface(labels, values, maxVal, maxH) {
     shape.lineTo(halfW, 0);
     shape.closePath();
 
-    const extrudeSettings = { depth: 1.0, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.05, bevelThickness: 0.05 };
+    const extrudeSettings = {
+        depth: 1.0,
+        bevelEnabled: !appState.lowSpecMode,
+        bevelSegments: 1,
+        steps: 1,
+        bevelSize: 0.05,
+        bevelThickness: 0.05
+    };
     const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     const mat = new THREE.MeshStandardMaterial({
         color: 0x6366f1,
@@ -671,6 +688,9 @@ function fitCameraToObjectBounds(count, style) {
 function createDomLabel(name, val, mesh, hOffset = 0, customX = null, customZ = null) {
     const layer = $('label-layer');
     if (!layer) return;
+
+    // 저사양 기기 최적화: DOM 레이어 병목 방지를 위해 상위 15개까지만 라벨 생성
+    if (appState.lowSpecMode && appState.domLabels.length >= 15) return;
 
     const div = document.createElement('div');
     div.className = 'label-3d';
@@ -921,6 +941,11 @@ function animateLoop() {
         if (window.__updateGpuModalLive) window.__updateGpuModalLive();
     }
 
+    // 저사양 2D 전용 모드일 경우 3D 렌더링을 일시 정지하여 GPU 부하 0% 유지
+    if (appState.lowSpecMode && appState.lowSpecType === '2d-only') {
+        return;
+    }
+
     updateCameraAnim();
 
     if (appState.controls) appState.controls.update();
@@ -929,6 +954,59 @@ function animateLoop() {
     }
     updateLabels();
 }
+
+/**
+ * 저사양 최적화 모드 제어 (3D 경량화 / 2D 전용 전환)
+ */
+export function setLowSpecMode(enabled, type = '3d-lite') {
+    appState.lowSpecMode = enabled;
+    appState.lowSpecType = type;
+    try {
+        localStorage.setItem('lowSpecMode', enabled ? 'true' : 'false');
+        localStorage.setItem('lowSpecType', type);
+    } catch (e) {}
+
+    const btn = $('btn-lowspec-toggle');
+    const label = $('lowspec-btn-label');
+    if (btn) {
+        btn.classList.toggle('active', enabled);
+        if (label) label.textContent = enabled ? '⚡ 저사양 ON' : '⚡ 저사양 모드';
+        btn.setAttribute('title', enabled ? '저사양 모드 활성화됨 (클릭하여 끄기)' : '저사양 기기 렉 방지 및 최적화 모드');
+    }
+
+    const menuCheckbox = $('menu-lowspec-toggle');
+    if (menuCheckbox) menuCheckbox.checked = enabled;
+
+    const modeSelect = $('menu-lowspec-type');
+    if (modeSelect) modeSelect.value = type;
+
+    const canvasContainer = $('canvas-container');
+    const lowspecCard = $('lowspec-container');
+
+    if (enabled && type === '2d-only') {
+        if (canvasContainer) canvasContainer.style.display = 'none';
+        if (lowspecCard) lowspecCard.style.display = 'flex';
+        if (window.__renderLowSpecChartWithData) {
+            window.__renderLowSpecChartWithData();
+        }
+        showToast('⚡ <strong>초경량 2D 모드 적용</strong>: 3D 가속을 중단하고 100% 렉 없는 2D 대시보드로 작동합니다.');
+    } else {
+        if (lowspecCard) lowspecCard.style.display = 'none';
+        if (canvasContainer) canvasContainer.style.display = 'block';
+        handleAdaptiveResize();
+        if (appState.parsedData && window.__applyVisualization) {
+            window.__applyVisualization();
+        }
+        if (enabled) {
+            showToast('⚡ <strong>3D 라이트 모드 적용</strong>: 해상도 1.0x 제한, 폴리곤 및 그림자 최적화로 렉을 방지합니다.');
+        } else {
+            showToast('🧊 <strong>표준 고화질 3D 모드 복원</strong>: 고해상도 안티앨리어싱 및 디테일이 복원되었습니다.');
+        }
+    }
+
+    window.dispatchEvent(new CustomEvent('lowspecchange', { detail: { enabled, type } }));
+}
+window.__setLowSpecMode = setLowSpecMode;
 
 /**
  * 카메라 프리셋 버튼 바인딩

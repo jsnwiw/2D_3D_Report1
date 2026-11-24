@@ -41,6 +41,10 @@ export const appState = {
     filterKeyword: '',
     dataLimit: 30, // 기본 상위 30개 표시 (대용량 최적화)
 
+    // 저사양 기기 최적화 및 렉 방지 모드
+    lowSpecMode: false,
+    lowSpecType: '3d-lite', // '3d-lite' (3D 최적화) 또는 '2d-only' (초경량 2D 모드)
+
     // Three.js 씬 및 3D 렌더링 객체
     scene: null,
     camera: null,
