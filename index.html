@@ -39,8 +39,17 @@
          ======================================================= -->
     <div id="canvas-container"></div>
     <!-- 저사양 기기용 2D 차트 컨테이너 (초기 숨김) -->
-    <div id="chart-2d" style="display:none; width:100%; height:400px; margin-top:20px;">
-        <canvas id="chart-2d-canvas" style="width:100%; height:100%;"></canvas>
+    <div id="lowspec-container" class="lowspec-card" style="display:none;">
+        <div class="lowspec-header">
+            <div class="lowspec-title">
+                <span class="toolbar-icon">⚡</span>
+                <h3>저사양 기기 최적화 2D 대시보드</h3>
+            </div>
+            <span class="lowspec-badge">2D 모드</span>
+        </div>
+        <div class="lowspec-body">
+            <canvas id="chart-2d-canvas"></canvas>
+        </div>
     </div>
 
     <!-- 3D → 2D 동기화 플로팅 툴팁 (3D 메쉬 마우스 호버 시 화면 좌표 추적 표시) -->
@@ -217,13 +226,13 @@
                         </button>
                     </div>
                     <!-- 데이터 특성 기반 AI 추천 보고서 유형 배지 -->
-                    <div id="ai-recommended-report-badge" class="report-recommend-banner" style="display:none; margin: 6px 0 10px 0; padding: 7px 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(129, 140, 248, 0.45); border-radius: 8px; font-size: 11px; color: #c7d2fe; cursor: pointer; transition: all 0.2s;" title="클릭 시 AI 추천 보고서 유형으로 즉시 작성합니다">
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 2px;">
-                            <span style="font-weight:700; color:#818cf8;">💡 AI 최적 추천 보고서</span>
-                            <span style="font-size:10px; background:rgba(99,102,241,0.3); padding:1px 5px; border-radius:4px; color:#e0e7ff;">자동 감지</span>
+                    <div id="ai-recommended-report-badge" class="report-recommend-banner" style="display:none;" title="클릭 시 AI 추천 보고서 유형으로 즉시 작성합니다">
+                        <div class="report-recommend-header">
+                            <span class="report-recommend-title">💡 AI 최적 추천 보고서</span>
+                            <span class="report-recommend-tag">자동 감지</span>
                         </div>
-                        <div id="recommended-report-type-name" style="font-weight:700; color:#ffffff; font-size:12px;">📊 종합 경영·비즈니스 전략 보고서</div>
-                        <div id="recommended-report-type-reason" style="font-size:10px; color:#94a3b8; margin-top:2px;"></div>
+                        <div id="recommended-report-type-name" class="report-recommend-name">📊 종합 경영·비즈니스 전략 보고서</div>
+                        <div id="recommended-report-type-reason" class="report-recommend-reason"></div>
                     </div>
                     <!-- AI 이상치/통계 요약 메시지 박스 -->
                     <div id="ai-insight-box"></div>
@@ -314,7 +323,7 @@
                     <!-- 1. 항목명 실시간 키워드 검색 -->
                     <div class="control-group">
                         <label for="filter-keyword">🔎 항목명 / 라벨 실시간 검색:</label>
-                        <input type="text" id="filter-keyword" placeholder="검색할 항목명 입력..." style="background: rgba(15, 23, 42, 0.75);">
+                        <input type="text" id="filter-keyword" placeholder="검색할 항목명 입력...">
                     </div>
 
                     <!-- 2. 대용량 데이터 표시 개수 제한 (Top N 렌더링 최적화) -->
@@ -477,26 +486,26 @@
                             <option value="custom">✏️ 직접 색상 코드 지정 (HEX)</option>
                         </select>
                         <!-- AI 색상 추천 근거 실시간 안내 배너 -->
-                        <div id="recommended-color-notice" style="margin-top:5px; padding:6px 10px; background:rgba(99,102,241,0.12); border:1px solid rgba(129,140,248,0.35); border-radius:6px; font-size:11px; color:#c7d2fe; line-height:1.4;">
-                            <div style="font-weight:700; color:#818cf8; margin-bottom:2px; display:flex; justify-content:space-between; align-items:center;">
-                                <span>💡 AI 데이터 분석 색상 추천</span>
-                                <span style="font-size:9.5px; background:rgba(99,102,241,0.25); color:#a5b4fc; padding:1px 5px; border-radius:3px;">실시간 연동</span>
+                        <div id="recommended-color-notice" class="recommended-color-banner">
+                            <div class="recommended-color-header">
+                                <span class="recommended-color-title">💡 AI 데이터 분석 색상 추천</span>
+                                <span class="recommended-color-tag">실시간 연동</span>
                             </div>
-                            <div id="recommended-color-text" style="color:#ffffff; font-weight:600;">데이터 로드 대기 중...</div>
+                            <div id="recommended-color-text" class="recommended-color-name">데이터 로드 대기 중...</div>
                         </div>
                     </div>
                     <!-- HEX 코드 직접 지정 시 나타나는 커스텀 컬러 패널 -->
-                    <div class="control-group" id="custom-color-group" style="display:none; background: rgba(99,102,241,0.12); padding: 10px 12px; border-radius: 8px; border: 1.5px solid rgba(99,102,241,0.35); margin-top: 4px;">
-                        <label for="custom-theme-color-picker" style="color: #a5b4fc; font-weight:700; font-size:12px;">🎨 색상 코드 (HEX) 직접 지정:</label>
-                        <div class="range-row" style="margin-top: 6px;">
+                    <div class="control-group custom-color-panel" id="custom-color-group" style="display:none;">
+                        <label for="custom-theme-color-picker">🎨 색상 코드 (HEX) 직접 지정:</label>
+                        <div class="range-row">
                             <input type="color" id="custom-theme-color-picker" value="#6366f1" title="색상 피커로 선택">
-                            <input type="text" id="custom-theme-color-code" value="#6366F1" placeholder="#6366F1" maxlength="7" style="width: 105px; text-transform: uppercase; font-family: monospace; font-weight: 700; letter-spacing: 0.5px; text-align: center; border: 1.5px solid #818cf8;">
-                            <span style="font-size: 11px; color: #94a3b8;">색상 코드</span>
+                            <input type="text" id="custom-theme-color-code" value="#6366F1" placeholder="#6366F1" maxlength="7">
+                            <span class="sub-label-text">색상 코드</span>
                         </div>
                     </div>
 
                     <!-- 11. 조명 및 환경값 원클릭 기본값 리셋 버튼 -->
-                    <button type="button" id="btn-reset-lighting" class="small-btn" style="width:100%; margin-top: 10px; padding: 7px; color: #a5b4fc; border-color: rgba(99,102,241,0.4);">
+                    <button type="button" id="btn-reset-lighting" class="small-btn reset-lighting-btn">
                         🔄 조명 & 환경설정 기본값 복원
                     </button>
                 </div>

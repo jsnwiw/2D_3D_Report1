@@ -2214,5 +2214,362 @@ html[data-theme="dark"] .api-btn-save {
   color: #ffffff !important;
 }
 
+/* =============================================================================
+ * 14. 라이트 & 다크 테마 완벽 통일 시스템 (Unified Light & Dark Theme System)
+ * ============================================================================= */
+
+/* 1. 저사양 최적화 2D 대시보드 카드 레이아웃 */
+.lowspec-card {
+  position: fixed;
+  top: 72px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  z-index: 10;
+  border-radius: 24px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  transition: all 0.28s ease;
+}
+
+.lowspec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+}
+
+.lowspec-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lowspec-title h3 {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.lowspec-badge {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.lowspec-body {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* 2. 라이트 테마 통일 컴포넌트 */
+html[data-theme="light"] .lowspec-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(99, 102, 241, 0.28) !important;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .lowspec-header {
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .lowspec-title h3 {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .lowspec-badge {
+  background: rgba(99, 102, 241, 0.12) !important;
+  color: #4338ca !important;
+  border: 1px solid rgba(99, 102, 241, 0.3) !important;
+}
+
+html[data-theme="light"] .toast-popup {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1.5px solid #059669 !important;
+  color: #065f46 !important;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16), 0 0 16px rgba(16, 185, 129, 0.2) !important;
+}
+
+html[data-theme="light"] .drag-drop-overlay {
+  background: rgba(241, 245, 249, 0.88) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+html[data-theme="light"] .drag-drop-card {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 2.5px dashed #4f46e5 !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18), 0 0 30px rgba(99, 102, 241, 0.15) !important;
+}
+
+html[data-theme="light"] .drag-drop-card h3 {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .drag-drop-card p {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .gpu-info-row {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .gpu-info-row .info-label {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .gpu-info-row .info-val {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .fps-sparkline-container {
+  background: rgba(241, 245, 249, 0.95) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .report-recommend-banner,
+html[data-theme="light"] .recommended-color-banner {
+  background: #eef2ff !important;
+  border: 1px solid #c7d2fe !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  margin: 6px 0 10px 0 !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .report-recommend-header,
+html[data-theme="light"] .recommended-color-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 3px !important;
+}
+
+html[data-theme="light"] .report-recommend-title,
+html[data-theme="light"] .recommended-color-title {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+  font-size: 11.5px !important;
+}
+
+html[data-theme="light"] .report-recommend-tag,
+html[data-theme="light"] .recommended-color-tag {
+  background: #e0e7ff !important;
+  color: #3730a3 !important;
+  font-size: 10px !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .report-recommend-name,
+html[data-theme="light"] .recommended-color-name {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+}
+
+html[data-theme="light"] .report-recommend-reason {
+  font-size: 10px !important;
+  color: #475569 !important;
+  margin-top: 2px !important;
+}
+
+html[data-theme="light"] .custom-color-panel {
+  background: rgba(241, 245, 249, 0.92) !important;
+  padding: 10px 12px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid rgba(99, 102, 241, 0.3) !important;
+  margin-top: 6px !important;
+}
+
+html[data-theme="light"] .custom-color-panel label {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .sub-label-text {
+  font-size: 11px !important;
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .reset-lighting-btn {
+  width: 100% !important;
+  margin-top: 10px !important;
+  padding: 8px !important;
+  color: #4338ca !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .reset-lighting-btn:hover {
+  background: #eef2ff !important;
+  border-color: #6366f1 !important;
+}
+
+/* 3. 다크 테마 통일 컴포넌트 */
+html[data-theme="dark"] .lowspec-card {
+  background: radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.18), transparent 50%),
+              linear-gradient(135deg, rgba(30, 20, 56, 0.88) 0%, rgba(13, 8, 30, 0.85) 100%) !important;
+  border: 1px solid rgba(168, 85, 247, 0.45) !important;
+  box-shadow: 0 28px 65px -10px rgba(0, 0, 0, 0.75), 0 0 40px rgba(147, 51, 234, 0.25) !important;
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .lowspec-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .lowspec-title h3 {
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .lowspec-badge {
+  background: rgba(168, 85, 247, 0.22) !important;
+  color: #c084fc !important;
+  border: 1px solid rgba(168, 85, 247, 0.45) !important;
+}
+
+html[data-theme="dark"] .toast-popup {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border: 1.5px solid #10b981 !important;
+  color: #34d399 !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.3) !important;
+}
+
+html[data-theme="dark"] .drag-drop-overlay {
+  background: rgba(8, 5, 20, 0.9) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+html[data-theme="dark"] .drag-drop-card {
+  background: rgba(25, 16, 48, 0.96) !important;
+  border: 2.5px dashed #a855f7 !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(168, 85, 247, 0.4) !important;
+}
+
+html[data-theme="dark"] .drag-drop-card h3 {
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .drag-drop-card p {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .gpu-info-row {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="dark"] .gpu-info-row .info-label {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .gpu-info-row .info-val {
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .fps-sparkline-container {
+  background: rgba(13, 8, 30, 0.8) !important;
+  border: 1px solid rgba(168, 85, 247, 0.3) !important;
+}
+
+html[data-theme="dark"] .report-recommend-banner,
+html[data-theme="dark"] .recommended-color-banner {
+  background: rgba(124, 58, 237, 0.18) !important;
+  border: 1px solid rgba(168, 85, 247, 0.45) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  margin: 6px 0 10px 0 !important;
+  color: #e9d5ff !important;
+}
+
+html[data-theme="dark"] .report-recommend-header,
+html[data-theme="dark"] .recommended-color-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 3px !important;
+}
+
+html[data-theme="dark"] .report-recommend-title,
+html[data-theme="dark"] .recommended-color-title {
+  color: #c084fc !important;
+  font-weight: 700 !important;
+  font-size: 11.5px !important;
+}
+
+html[data-theme="dark"] .report-recommend-tag,
+html[data-theme="dark"] .recommended-color-tag {
+  background: rgba(168, 85, 247, 0.3) !important;
+  color: #f3e8ff !important;
+  font-size: 10px !important;
+  padding: 1px 6px !important;
+  border-radius: 4px !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="dark"] .report-recommend-name,
+html[data-theme="dark"] .recommended-color-name {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+}
+
+html[data-theme="dark"] .report-recommend-reason {
+  font-size: 10px !important;
+  color: #cbd5e1 !important;
+  margin-top: 2px !important;
+}
+
+html[data-theme="dark"] .custom-color-panel {
+  background: rgba(255, 255, 255, 0.05) !important;
+  padding: 10px 12px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid rgba(168, 85, 247, 0.35) !important;
+  margin-top: 6px !important;
+}
+
+html[data-theme="dark"] .custom-color-panel label {
+  color: #c084fc !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="dark"] .sub-label-text {
+  font-size: 11px !important;
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .reset-lighting-btn {
+  width: 100% !important;
+  margin-top: 10px !important;
+  padding: 8px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="dark"] .reset-lighting-btn:hover {
+  background: rgba(168, 85, 247, 0.25) !important;
+  color: #ffffff !important;
+  border-color: #c084fc !important;
+}
+
+
 
 

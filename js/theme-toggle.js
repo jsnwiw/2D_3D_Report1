@@ -11,6 +11,11 @@
       console.warn('localStorage access failed:', e);
     }
 
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', theme === 'dark' ? '#0f172a' : '#f8fafc');
+    }
+
     const buttons = document.querySelectorAll('#theme-toggle, #btn-toggle-theme, .theme-toggle-btn');
     buttons.forEach((btn) => {
       btn.innerHTML = theme === 'dark'

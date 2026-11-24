@@ -66,8 +66,8 @@
         align-items: center;
         padding: 3px 6px;
         gap: 2px;
-        background: rgba(30, 41, 59, 0.95);
-        border: 1px solid rgba(129, 140, 248, 0.4);
+        background: var(--fg-glass-btn-bg, rgba(30, 41, 59, 0.95));
+        border: var(--fg-glass-border, 1px solid rgba(129, 140, 248, 0.4));
         border-radius: 6px;
     }
     .topbar-style-label {
@@ -81,7 +81,8 @@
         max-width: 105px;
         font-size: 11px;
         padding: 2px 0;
-        color: #e2e8f0;
+        color: var(--db-text, #e2e8f0);
+        background: transparent;
     }
 
     #mobile-action-bar {
@@ -94,8 +95,8 @@
         justify-content: space-around;
         gap: 3px;
         padding: 5px 4px calc(5px + env(safe-area-inset-bottom, 0px));
-        background: rgba(15, 23, 42, 0.97);
-        border-top: 1px solid rgba(99, 102, 241, 0.35);
+        background: var(--fg-glass-panel-bg, rgba(15, 23, 42, 0.97));
+        border-top: var(--fg-glass-border, 1px solid rgba(99, 102, 241, 0.35));
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
     }
@@ -108,10 +109,10 @@
         align-items: center;
         justify-content: center;
         gap: 2px;
-        border: 1px solid rgba(99, 102, 241, 0.25);
+        border: var(--fg-glass-border-subtle, 1px solid rgba(99, 102, 241, 0.25));
         border-radius: 8px;
-        background: rgba(30, 41, 59, 0.85);
-        color: #e2e8f0;
+        background: var(--fg-glass-btn-bg, rgba(30, 41, 59, 0.85));
+        color: var(--db-text, #e2e8f0);
         font: inherit;
         font-size: 9.5px;
         font-weight: 700;
