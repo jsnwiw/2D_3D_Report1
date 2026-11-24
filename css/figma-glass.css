@@ -2659,6 +2659,197 @@ html[data-theme="dark"] .lowspec-perf-tip strong {
   color: #34d399 !important;
 }
 
+/* =============================================================================
+ * 16. 기능 사이드바 버튼 크기 및 터치 타깃 확대 (Enlarged Sidebar Buttons)
+ * ============================================================================= */
+
+/* 1. 상단 툴바의 사이드바 열기/닫기 메뉴 버튼 */
+.menu-toggle-btn {
+  padding: 8px 18px !important;
+  font-size: 13.5px !important;
+  min-height: 38px !important;
+  font-weight: 800 !important;
+  border-radius: var(--fg-pill-radius) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.22s var(--ui-spring) !important;
+}
+
+.menu-toggle-btn:hover {
+  transform: translateY(-1.5px) scale(1.03) !important;
+}
+
+/* 2. 사이드바 상단 헤더 버튼 (최상단/최하단 이동, 닫기) */
+.menu-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.menu-nav-btn {
+  padding: 7px 13px !important;
+  font-size: 13px !important;
+  min-height: 34px !important;
+  min-width: 34px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.close-menu-btn {
+  padding: 6px 14px !important;
+  font-size: 18px !important;
+  min-height: 34px !important;
+  min-width: 36px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+/* 3. 아코디언 섹션 타이틀 헤더 */
+.accordion-header {
+  padding: 13px 18px !important;
+  min-height: 48px !important;
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  transition: all 0.22s ease !important;
+}
+
+.accordion-header .header-title {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.accordion-header .chevron {
+  font-size: 15px !important;
+}
+
+/* 4. 사이드바 내부 핵심 액션 버튼 확대 */
+
+/* 시각화 수동 적용 버튼 */
+.apply-btn {
+  width: 100% !important;
+  padding: 12px 20px !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  min-height: 46px !important;
+  border-radius: 12px !important;
+  margin-top: 10px !important;
+  cursor: pointer !important;
+  letter-spacing: -0.2px !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35) !important;
+  transition: all 0.24s var(--ui-spring) !important;
+}
+
+.apply-btn:hover {
+  transform: translateY(-2px) scale(1.015) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* 추천 시각화 즉시 적용 버튼 */
+.btn-rec-action {
+  width: 100% !important;
+  padding: 11px 18px !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  min-height: 42px !important;
+  border-radius: 10px !important;
+  margin-top: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.22s ease !important;
+}
+
+.btn-rec-action:hover {
+  transform: translateY(-1.5px) !important;
+}
+
+/* AI 맞춤 보고서 작성 바로가기 버튼 */
+.ai-report-shortcut-btn {
+  width: 100% !important;
+  padding: 13px 18px !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  min-height: 46px !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  transition: all 0.24s var(--ui-spring) !important;
+}
+
+.ai-report-shortcut-btn:hover {
+  transform: translateY(-2px) scale(1.015) !important;
+}
+
+/* 퀵 필터 버튼 그룹 및 개별 버튼 */
+.quick-filter-group {
+  gap: 6px !important;
+}
+
+.small-btn {
+  padding: 8px 14px !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  min-height: 36px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.small-btn:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* 조명 & 환경설정 기본값 복원 버튼 */
+.reset-lighting-btn {
+  padding: 11px 16px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  min-height: 42px !important;
+  border-radius: 10px !important;
+  margin-top: 12px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.reset-lighting-btn:hover {
+  transform: translateY(-1.5px) !important;
+}
+
+/* 수치 범위 필터 적용 버튼 */
+#btn-apply-range {
+  padding: 8px 16px !important;
+  font-size: 12.5px !important;
+  min-height: 36px !important;
+  font-weight: 700 !important;
+}
+
+/* 5. 사이드바 셀렉트 및 텍스트 인풋 높이 편의 개선 */
+.menu-drawer select,
+.menu-drawer input[type="text"],
+.menu-drawer input[type="number"] {
+  min-height: 38px !important;
+  padding: 6px 12px !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+}
+
+
 
 
 
