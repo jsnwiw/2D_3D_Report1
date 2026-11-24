@@ -408,6 +408,17 @@ export function setupTopBarActions() {
         }
     });
 
+    // 상단 툴바 마우스 휠 좌우 가로 스크롤 연동
+    const topBarRight = document.querySelector('.top-bar-right');
+    if (topBarRight) {
+        topBarRight.addEventListener('wheel', (e) => {
+            if (e.deltaY !== 0) {
+                e.preventDefault();
+                topBarRight.scrollLeft += e.deltaY;
+            }
+        }, { passive: false });
+    }
+    
     btnToggleMenu?.addEventListener('click', () => {
         if (menuPanel) {
             const isOpen = menuPanel.classList.toggle('open');

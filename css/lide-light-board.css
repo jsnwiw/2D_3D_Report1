@@ -6,11 +6,11 @@ html[data-theme="light"] {
   --db-bg-panel: rgba(255, 255, 255, 0.78);
   --db-bg-card: rgba(241, 245, 249, 0.65);
   --db-text: #0f172a;
-  --db-text-muted: #64748b;
-  --db-primary: #4f46e5;
+  --db-text-muted: #475569;
+  --db-primary: #4338ca;
   --db-primary-light: #6366f1;
-  --db-border: rgba(99, 102, 241, 0.22);
-  --db-border-hover: rgba(99, 102, 241, 0.45);
+  --db-border: rgba(99, 102, 241, 0.28);
+  --db-border-hover: rgba(99, 102, 241, 0.55);
   --db-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
 }
 
@@ -34,9 +34,10 @@ html[data-theme="light"] .top-bar-left h1 {
 
 /* 상단 바 버튼 그룹 */
 html[data-theme="light"] .top-bar-right button {
-  background: rgba(241, 245, 249, 0.92);
+  background: rgba(241, 245, 249, 0.95);
   border: 1px solid var(--db-border);
-  color: #334155;
+  color: #0f172a;
+  font-weight: 700;
 }
 
 html[data-theme="light"] .top-bar-right button:hover {

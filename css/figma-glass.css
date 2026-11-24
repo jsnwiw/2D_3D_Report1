@@ -202,6 +202,47 @@ html[data-theme="light"] .panel-ctrl-btn {
   box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.3), var(--fg-glass-specular) !important;
 }
 
+/* 상단 우측 컨트롤 바: 매끄러운 가로 스크롤 및 피그마 글래스 스크롤바 */
+.top-bar-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 4px 6px 6px 6px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(168, 85, 247, 0.45) transparent !important;
+}
+
+.top-bar-right::-webkit-scrollbar {
+  height: 4px !important;
+  display: block !important;
+}
+
+.top-bar-right::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-radius: 9999px !important;
+}
+
+.top-bar-right::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.45) !important;
+  border-radius: 9999px !important;
+}
+
+.top-bar-right::-webkit-scrollbar-thumb:hover {
+  background: rgba(192, 132, 252, 0.8) !important;
+}
+
+.top-bar-right button,
+.topbar-style-wrap {
+  flex-shrink: 0 !important;
+}
+
 /* 상단 바 버튼: 피그마 스타일 글래스 필/라운드 버튼 */
 .top-bar-right button {
   background: var(--fg-glass-btn-bg) !important;
@@ -367,3 +408,1011 @@ input[type="number"]:focus {
   box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3) !important;
   outline: none;
 }
+
+/* ==============================================================================
+ * 8. 라이트 모드 고대비 텍스트 가독성 최적화 (High-Contrast Light Mode Typography)
+ * ============================================================================== */
+
+/* 기본 본문 및 문서 전반 */
+html[data-theme="light"],
+html[data-theme="light"] body {
+  color: #0f172a !important;
+}
+
+/* 상단 글로벌 툴바 텍스트 및 버튼 */
+html[data-theme="light"] .top-bar-left h1 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] #status-indicator.online {
+  color: #065f46 !important;
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(5, 150, 105, 0.4) !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #status-indicator.offline {
+  color: #334155 !important;
+  background: rgba(100, 116, 139, 0.14) !important;
+  border-color: rgba(100, 116, 139, 0.3) !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #status-indicator.loading {
+  color: #92400e !important;
+  background: rgba(245, 158, 11, 0.16) !important;
+  border-color: rgba(217, 119, 6, 0.4) !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #gpu-engine-badge {
+  color: #065f46 !important;
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: rgba(5, 150, 105, 0.4) !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #gpu-engine-text,
+html[data-theme="light"] #gpu-badge-fps {
+  color: #047857 !important;
+  font-weight: 700 !important;
+}
+
+/* 3D 스타일 선택기 셀렉터 */
+html[data-theme="light"] .topbar-style-wrap {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
+}
+
+html[data-theme="light"] .topbar-style-label {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .topbar-style-select {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  background: transparent !important;
+}
+
+html[data-theme="light"] .topbar-style-select option {
+  color: #0f172a !important;
+  background: #ffffff !important;
+}
+
+/* 상단 툴바 버튼 그룹 */
+html[data-theme="light"] .top-bar-right button {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(203, 213, 225, 0.9) !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+}
+
+html[data-theme="light"] .top-bar-right button:hover {
+  color: #4338ca !important;
+  background: rgba(238, 242, 255, 0.95) !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+}
+
+html[data-theme="light"] .topbar-ai-report-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid #4338ca !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35) !important;
+}
+
+html[data-theme="light"] .topbar-ai-report-btn:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+  color: #ffffff !important;
+}
+
+/* 데이터 소스 업로드 카드 */
+html[data-theme="light"] .upload-card {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .upload-card-top {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .upload-badge {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+  background: rgba(99, 102, 241, 0.12) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+html[data-theme="light"] .file-name-text {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .upload-card-toggle-btn {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .upload-btn {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1.5px dashed rgba(99, 102, 241, 0.5) !important;
+}
+
+html[data-theme="light"] .upload-btn:hover {
+  color: #4338ca !important;
+  background: rgba(238, 242, 255, 0.95) !important;
+  border-color: #4f46e5 !important;
+}
+
+html[data-theme="light"] .upload-encoding-row label {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+/* 우측 사이드바 대시보드 메뉴 드로어 */
+html[data-theme="light"] .menu-drawer {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .menu-header h3 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .menu-nav-btn {
+  color: #334155 !important;
+  font-weight: 700 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .menu-nav-btn:hover {
+  color: #4338ca !important;
+  border-color: #6366f1 !important;
+}
+
+html[data-theme="light"] .close-menu-btn {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .close-menu-btn:hover {
+  color: #ef4444 !important;
+}
+
+html[data-theme="light"] .accordion-item {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(203, 213, 225, 0.9) !important;
+}
+
+html[data-theme="light"] .accordion-item.active {
+  background: #ffffff !important;
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08) !important;
+}
+
+html[data-theme="light"] .accordion-header {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .accordion-header .header-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .accordion-header .chevron {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .accordion-body {
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .control-group label {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .control-group strong {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .slider-label-row label {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .slider-val-badge {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+  background: rgba(99, 102, 241, 0.12) !important;
+}
+
+html[data-theme="light"] .recommend-toggle-label {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .applied-notice-text {
+  color: #334155 !important;
+  line-height: 1.5 !important;
+}
+
+html[data-theme="light"] .btn-rec-action,
+html[data-theme="light"] .apply-btn {
+  color: #ffffff !important;
+  background: #4f46e5 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .btn-rec-action:hover,
+html[data-theme="light"] .apply-btn:hover {
+  background: #4338ca !important;
+}
+
+html[data-theme="light"] .small-btn {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .small-btn:hover {
+  color: #4338ca !important;
+  border-color: #6366f1 !important;
+  background: #eef2ff !important;
+}
+
+html[data-theme="light"] #detail-card {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] #detail-name {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] #detail-stats {
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .stat-row {
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .stat-label {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+html[data-theme="light"] .stat-val {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #ai-insight-box {
+  color: #1e293b !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
+}
+
+html[data-theme="light"] #ai-recommended-report-badge {
+  color: #1e293b !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+html[data-theme="light"] #ai-recommended-report-badge span,
+html[data-theme="light"] #ai-recommended-report-badge div {
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] #recommended-report-type-name {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] #recommended-report-type-reason {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] #analysis-result {
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] #recommended-color-notice {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] #recommended-color-notice span,
+html[data-theme="light"] #recommended-color-notice div {
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] #recommended-color-text {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #custom-color-group {
+  background: rgba(99, 102, 241, 0.08) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+html[data-theme="light"] #custom-color-group label {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #modal-gpu-frame-count {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] #btn-reset-lighting {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+/* 폼 인풋 및 셀렉트 박스 */
+html[data-theme="light"] select,
+html[data-theme="light"] input[type="text"],
+html[data-theme="light"] input[type="number"] {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] select:focus,
+html[data-theme="light"] input[type="text"]:focus,
+html[data-theme="light"] input[type="number"]:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+}
+
+html[data-theme="light"] select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] input::placeholder {
+  color: #64748b !important;
+}
+
+/* 2D 분석 그래프 카드 */
+html[data-theme="light"] #chart-title {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .panel-ctrl-btn {
+  color: #0f172a !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .panel-ctrl-btn:hover {
+  color: #4338ca !important;
+  border-color: #6366f1 !important;
+}
+
+/* 하단 타임라인 플레이어 */
+html[data-theme="light"] .time-player-panel {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .time-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .time-col-name {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .time-step-badge {
+  color: #334155 !important;
+  font-weight: 700 !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+html[data-theme="light"] .time-btn {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .time-btn:hover {
+  color: #4338ca !important;
+  border-color: #6366f1 !important;
+}
+
+html[data-theme="light"] .time-speed-wrap select {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .time-close-btn {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+/* 3D 라벨 및 실시간 툴팁 */
+html[data-theme="light"] .label-3d {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(99, 102, 241, 0.4) !important;
+}
+
+html[data-theme="light"] .tooltip-3d {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.15) !important;
+}
+
+html[data-theme="light"] #tooltip-name {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] #tooltip-value {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+/* 모달 다이얼로그 (사용법, GPU, AI 보고서 등) */
+html[data-theme="light"] .modal-card {
+  color: #0f172a !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid rgba(203, 213, 225, 0.8) !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2) !important;
+}
+
+html[data-theme="light"] .modal-header h3 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .modal-subtitle {
+  color: #334155 !important;
+  font-weight: 500 !important;
+}
+
+html[data-theme="light"] .modal-close-btn {
+  color: #334155 !important;
+  background: rgba(241, 245, 249, 0.95) !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .modal-close-btn:hover {
+  color: #ef4444 !important;
+}
+
+html[data-theme="light"] .info-label {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .info-val {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .gpu-tech-note {
+  background: rgba(99, 102, 241, 0.08) !important;
+  border: 1px solid rgba(99, 102, 241, 0.25) !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .gpu-tech-note .note-title {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .usage-guide-steps h4 {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .usage-guide-steps p {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .usage-guide-step-number {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .usage-guide-tip {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.25) !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .usage-guide-tip strong {
+  color: #4338ca !important;
+}
+
+html[data-theme="light"] .usage-guide-secondary {
+  color: #334155 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 600 !important;
+}
+
+/* 모바일 전용 빠른 메뉴바 */
+html[data-theme="light"] #mobile-action-bar {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-top: 1px solid rgba(99, 102, 241, 0.25) !important;
+}
+
+html[data-theme="light"] .mobile-action {
+  color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .mobile-action.active {
+  color: #4338ca !important;
+  font-weight: 700 !important;
+}
+
+/* =============================================================================
+ * 12. AI 자동 분석 보고서 스튜디오 (AI Report Studio) - 라이트 모드 완전 대응
+ * ============================================================================= */
+/* 모달 백드롭: 반투명 소프트 글래스 블러 */
+html[data-theme="light"] .ai-report-modal-backdrop {
+  background: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* 모달 카드 메인 컨테이너 */
+html[data-theme="light"] .ai-report-modal-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(203, 213, 225, 0.85) !important;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.18), 0 0 35px rgba(99, 102, 241, 0.12) !important;
+  color: #0f172a !important;
+}
+
+/* 모달 헤더 */
+html[data-theme="light"] .ai-report-modal-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .ai-report-modal-header .modal-title h3 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .ai-report-modal-header .modal-subtitle {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+/* 헤더 액션 툴 버튼들 */
+html[data-theme="light"] .ai-report-header-actions .report-btn-tool {
+  background: #f8fafc !important;
+  color: #1e293b !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .ai-report-header-actions .report-btn-tool:hover {
+  background: #eef2ff !important;
+  color: #4338ca !important;
+  border-color: #818cf8 !important;
+}
+
+html[data-theme="light"] .ai-report-header-actions .report-btn-tool.active {
+  background: #e0e7ff !important;
+  color: #3730a3 !important;
+  border-color: #6366f1 !important;
+}
+
+html[data-theme="light"] .ai-report-header-actions .report-btn-primary {
+  background: linear-gradient(135deg, #2563eb, #4f46e5) !important;
+  color: #ffffff !important;
+  border: 1px solid #3b82f6 !important;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28) !important;
+}
+
+html[data-theme="light"] .ai-report-header-actions .report-btn-primary:hover {
+  background: linear-gradient(135deg, #1d4ed8, #4338ca) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
+}
+
+html[data-theme="light"] .ai-report-header-actions .modal-close-btn {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .ai-report-header-actions .modal-close-btn:hover {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* 상단 컨트롤 툴바 */
+html[data-theme="light"] .ai-report-toolbar {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .ai-control-item label {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .ai-badge-pill {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .ai-badge-pill.subtle {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .ai-toolbar-select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .ai-toolbar-select:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+}
+
+html[data-theme="light"] .ai-toolbar-select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .report-btn-subtle {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="light"] .report-btn-subtle:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #94a3b8 !important;
+}
+
+html[data-theme="light"] .report-btn-generate {
+  background: linear-gradient(135deg, #7c3aed, #ec4899) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(236, 72, 153, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3) !important;
+}
+
+/* AI 실시간 추천 알림 바 */
+html[data-theme="light"] .ai-toolbar-recommend-row {
+  background: #eef2ff !important;
+  border: 1px solid #c7d2fe !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .ai-recommend-lead {
+  color: #4338ca !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .ai-recommend-reason-item {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .ai-recommend-reason-item strong {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+/* AI 프로그레스 바 */
+html[data-theme="light"] .ai-generation-progress {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .ai-progress-bar-track {
+  background: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .ai-progress-text {
+  color: #6d28d9 !important;
+  font-weight: 700 !important;
+}
+
+/* 스크롤 뷰포트 & 백색 A4 용지 */
+html[data-theme="light"] .ai-report-scroll-viewport {
+  background: #e2e8f0 !important; /* 선명하게 대비되는 스튜디오 책상 배경 */
+}
+
+html[data-theme="light"] .ai-report-paper {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.06) !important;
+}
+
+html[data-theme="light"] .ai-report-content {
+  color: #0f172a !important;
+}
+
+/* 보고서 내부 요소 고대비 스타일링 */
+html[data-theme="light"] .report-doc-top {
+  border-bottom: 2px solid #0f172a !important;
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .report-doc-confidential {
+  color: #dc2626 !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .report-doc-header {
+  border-bottom: 2px solid #4f46e5 !important;
+}
+
+html[data-theme="light"] .report-main-title {
+  color: #0f172a !important;
+  font-weight: 900 !important;
+}
+
+html[data-theme="light"] .report-sub-title {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+html[data-theme="light"] .report-doc-meta {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .report-meta-tag {
+  background: #e0e7ff !important;
+  color: #3730a3 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .report-edit-banner {
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  color: #1e40af !important;
+}
+
+html[data-theme="light"] .report-section-title {
+  color: #0f172a !important;
+  border-left: 4px solid #4f46e5 !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] .report-exec-box {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-left: 4px solid #3b82f6 !important;
+  color: #1e293b !important;
+}
+
+/* 통계 그리드 & KPI 카드 */
+html[data-theme="light"] .report-kpi-card {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .report-kpi-label {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .report-kpi-val {
+  color: #4338ca !important;
+  font-weight: 800 !important;
+}
+
+/* 시각화 카드 */
+html[data-theme="light"] .report-visual-card {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .report-visual-card h5 {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .report-visual-card-header {
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .report-visual-card-header h5 {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .report-visual-badge {
+  background: #e0e7ff !important;
+  color: #3730a3 !important;
+}
+
+html[data-theme="light"] .report-chart-img-wrap {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+html[data-theme="light"] .report-visual-caption {
+  color: #64748b !important;
+}
+
+/* 심층 분석 카드 */
+html[data-theme="light"] .report-deep-card {
+  background: #faf5ff !important;
+  border: 1px solid #e9d5ff !important;
+  color: #581c87 !important;
+}
+
+html[data-theme="light"] .report-deep-card.warning {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #92400e !important;
+}
+
+html[data-theme="light"] .report-deep-card.success {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #166534 !important;
+}
+
+html[data-theme="light"] .report-deep-card.info {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1e40af !important;
+}
+
+/* 전략 제언 항목 */
+html[data-theme="light"] .report-recom-item {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-left: 3px solid #10b981 !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .report-recom-content strong {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+/* 데이터 표 */
+html[data-theme="light"] .report-table {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .report-table th {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  font-weight: 700 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .report-table td {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .report-table tr:nth-child(even) td {
+  background: #f8fafc !important;
+}
+
+/* 결재란 테이블 */
+html[data-theme="light"] .report-approval-table th {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .report-approval-table td {
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* 사이드바 AI 바로가기 배너 및 버튼 */
+html[data-theme="light"] .ai-report-shortcut-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25) !important;
+}
+
+html[data-theme="light"] .upload-ai-quick-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] .report-recommend-banner {
+  background: #eef2ff !important;
+  border: 1px solid #c7d2fe !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] #recommended-report-type-name {
+  color: #4338ca !important;
+  font-weight: 800 !important;
+}
+
+html[data-theme="light"] #recommended-report-type-reason {
+  color: #475569 !important;
+}
+
+/* API 설정 모달 */
+html[data-theme="light"] .ai-api-modal-card {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2) !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .api-modal-desc {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .api-input-group label {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] .api-input-group input {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+}
+
+html[data-theme="light"] .api-input-group input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+}
+
+html[data-theme="light"] .api-btn-clear {
+  background: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+}
+
+html[data-theme="light"] .api-btn-clear:hover {
+  background: #fee2e2 !important;
+}
+
+html[data-theme="light"] .api-btn-save {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+}
+
+

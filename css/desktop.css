@@ -26,6 +26,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1;
+    min-width: 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ==============================================================================
