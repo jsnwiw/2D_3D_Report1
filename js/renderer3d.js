@@ -183,7 +183,21 @@ export async function initThreeScene() {
     appState.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
     appState.camera.position.set(0, 10, 20);
 
-    appState.renderer = new WebGPURenderer({ antialias: true, alpha: false, forceWebGL: false });
+    // Handle window resize to keep camera and renderer in sync
+    const onWindowResize = () => {
+        if (!appState.camera || !appState.renderer) return;
+        appState.camera.aspect = window.innerWidth / window.innerHeight;
+        appState.camera.updateProjectionMatrix();
+        appState.renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    // Simple debounce to avoid excessive calls during rapid resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(onWindowResize, 150);
+    });
+    // Initial resize to ensure correct size on load
+    onWindowResize();
     await appState.renderer.init();
 
     // 실제 어댑터 정보 조회
@@ -879,6 +893,33 @@ function createDomLabel(name, val, mesh, hOffset = 0, customX = null, customZ = 
 }
 
 export function updateLabels() {
+    // Throttle label updates to ~30 fps to reduce DOM work
+    const now = performance.now();
+    if (now - (appState.lastLabelUpdateTime || 0) < 33) return;
+    appState.lastLabelUpdateTime = now;
+    if (!appState.camera || !appState.renderer || !appState.domLabels.length) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    appState.domLabels.forEach(l => {
+        if (!l.mesh) return;
+        tempVec.copy(l.mesh.position);
+        tempVec.y += l.hOffset || 0;
+        if (l.customX !== null) tempVec.x = l.customX;
+        if (l.customZ !== null) tempVec.z = l.customZ;
+
+        tempVec.project(appState.camera);
+        if (tempVec.z > 1) {
+            l.el.style.opacity = '0';
+            return;
+        }
+        const x = (tempVec.x * 0.5 + 0.5) * w;
+        const y = (-tempVec.y * 0.5 + 0.5) * h;
+        l.el.style.left = `${x}px`;
+        l.el.style.top = `${y}px`;
+        l.el.style.opacity = '1';
+    });
+}
     if (!appState.camera || !appState.renderer || !appState.domLabels.length) return;
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -939,7 +980,50 @@ function setupRaycasting() {
     });
 
     // 마우스 호버 (모바일 터치 드래그 중에는 호버 툴팁 비활성화)
-    container.addEventListener('pointermove', (e) => {
+    // Throttle pointermove to reduce raycasting overhead (max once per 50 ms)
+        let lastPointerMove = 0;
+        container.addEventListener('pointermove', (e) => {
+            const now = performance.now();
+            if (now - lastPointerMove < 50) return; // skip if called too quickly
+            lastPointerMove = now;
+            if (e.pointerType === 'touch') return;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            if (tooltip && tooltip.style.display !== 'none') {
+                const tipX = Math.min(e.clientX + 14, window.innerWidth - 140);
+                const tipY = Math.max(10, Math.min(e.clientY + 14, window.innerHeight - 80));
+                tooltip.style.left = `${tipX}px`;
+                tooltip.style.top = `${tipY}px`;
+            }
+            if (!appState.dataObjects.length || !appState.camera) return;
+            raycaster.setFromCamera(mouse, appState.camera);
+            const hits = raycaster.intersectObjects(appState.dataObjects, false);
+            if (hits.length > 0) {
+                const hit = hits[0].object;
+                if (hoveredObject && hoveredObject !== selectedObject) {
+                    hoveredObject.material.emissive?.setHex(0x000000);
+                }
+                hoveredObject = hit;
+                if (hoveredObject !== selectedObject) {
+                    hoveredObject.material.emissive?.setHex(0x312e81);
+                }
+                if (tooltip && tooltipName && tooltipValue) {
+                    tooltip.style.display = 'block';
+                    tooltipName.textContent = hit.userData.name || '데이터';
+                    tooltipValue.textContent = typeof hit.userData.value === 'number'
+                        ? hit.userData.value.toLocaleString()
+                        : hit.userData.value;
+                }
+                container.style.cursor = 'pointer';
+            } else {
+                if (hoveredObject && hoveredObject !== selectedObject) {
+                    hoveredObject.material.emissive?.setHex(0x000000);
+                }
+                hoveredObject = null;
+                if (tooltip) tooltip.style.display = 'none';
+                container.style.cursor = 'grab';
+            }
+        });
         if (e.pointerType === 'touch') return;
 
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -1081,7 +1165,8 @@ function updateCameraAnim() {
 /**
  * 렌더 루프 및 실시간 FPS 성능 측정 엔진
  */
-function animateLoop() {
+// Skip rendering when tab is hidden to save CPU
+    if (document.hidden) return;
     requestAnimationFrame(animateLoop);
 
     const delta = clock.getDelta();
