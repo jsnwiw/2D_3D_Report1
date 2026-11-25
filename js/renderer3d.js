@@ -123,6 +123,25 @@ function createDataMaterial(color, extraOpts = {}) {
  * 3D 씬 및 WebGPURenderer 초기화
  */
 export async function initThreeScene() {
+    // Detect low‑spec device early and enable lightweight mode
+    // Simple heuristic: few logical processors or low GPU tier
+    const isLowSpecDevice = () => {
+        const cores = navigator.hardwareConcurrency || 0;
+        // If less than 4 cores, consider low‑spec
+        if (cores && cores < 4) return true;
+        // Use WebGPU adapter info if available
+        if (appState.gpuEngineState && appState.gpuEngineState.gpuName) {
+            const lowGpuKeywords = ['Intel HD', 'Intel UHD', 'Mali', 'Adreno 3'];
+            const name = appState.gpuEngineState.gpuName.toLowerCase();
+            if (lowGpuKeywords.some(k => name.includes(k.toLowerCase()))) return true;
+        }
+        return false;
+    };
+    if (isLowSpecDevice()) {
+        // Turn on low‑spec mode before any heavy geometry is created
+        setLowSpecMode(true, '3d-lite', { manual: true, initial: true });
+        console.log('[LowSpec] Device detected as low‑spec – activating 3d‑lite mode');
+    }
     const container = $('canvas-container');
     if (!container) return;
 
@@ -139,13 +158,27 @@ export async function initThreeScene() {
         const theme = e.detail?.theme || document.documentElement.getAttribute('data-theme') || 'light';
         const isDark = theme === 'dark';
         const newBgHex = isDark ? 0x0f172a : 0xf1f5f9;
-        if (appState.scene) {
-            appState.scene.background = new THREE.Color(newBgHex);
-            if (appState.scene.fog) appState.scene.fog.color = new THREE.Color(newBgHex);
-        }
+        // Animate background and fog color transition
+        const oldBgHex = appState.scene?.background?.getHex ? appState.scene.background.getHex() : newBgHex;
+        const duration = 600; // ms
+        const startColor = new THREE.Color(oldBgHex);
+        const endColor = new THREE.Color(newBgHex);
+        const startTime = performance.now();
+        const step = () => {
+            const now = performance.now();
+            const t = Math.min(1, (now - startTime) / duration);
+            const lerped = startColor.clone().lerp(endColor, t);
+            if (appState.scene) {
+                appState.scene.background.copy(lerped);
+                if (appState.scene.fog) appState.scene.fog.color.copy(lerped);
+            }
+            if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
         const bgInput = $('bg-color');
         if (bgInput) bgInput.value = isDark ? '#0f172a' : '#f1f5f9';
     });
+
 
     appState.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
     appState.camera.position.set(0, 10, 20);

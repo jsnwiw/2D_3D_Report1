@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+    <!-- 문서 문자 인코딩 설정 (표준 UTF-8) -->
+    <meta charset="UTF-8">
+    <!-- 모바일 및 다양한 디바이스 뷰포트 반응형 설정 (화면 배율 및 터치 고정) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>3D 데이터 시각화 – 통합 페이지</title>
+    <!-- =======================================================
+         PWA(Progressive Web App) 모바일 홈화면 설치 및 테마 설정
+         ======================================================= -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="3D시각화">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <!-- 외부 스타일시트 및 서드파티 라이브러리 CDN -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <!-- 2D 보조 차트 렌더링 라이브러리 (Chart.js v4) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- 엑셀(.xlsx, .xls) 바이너리 파싱 지원 SheetJS 라이브러리 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <!-- ==== Desktop View (기존 index.html) ==== -->
+    <div class="desktop-view">
+        <!-- 복사된 index.html 본문 시작 -->
+        <header id="system-info" class="system-info no-print" style="display: none !important;">
+            <div id="system-platform">🖥 플랫폼: 감지 중...</div>
+            <div id="system-manufacturer">🏭 GPU 제조사: 감지 중...</div>
+            <div id="system-cpu">⚙️ CPU 코어: 감지 중...</div>
+            <div id="system-gpu">🎮 GPU 모델: 감지 중...</div>
+            <div id="gpu-engine-info">⚡ 엔진: 감지 중...</div>
+        </header>
+        <!-- (이하 index.html 전체 내용을 그대로 삽입) -->
+        <!-- 1. 3D 뷰포트 메인 컨테이너 -->
+        <div id="canvas-container"></div>
+        <!-- 2. 상단 글로벌 컨트롤 바 -->
+        <header id="top-bar">
+            <div class="top-bar-left">
+                <h1>📊 3D 시각화 <span style="font-size:10px; color:#38bdf8; background:rgba(56,189,248,0.2); padding:1px 5px; border-radius:4px; font-weight:normal;">데스크톱</span></h1>
+                <span id="status-indicator" class="status offline">● 대기 중</span>
+                <button id="gpu-engine-badge" class="gpu-badge" title="GPU 가속 엔진 상태 및 실시간 FPS (클릭하여 사양 및 성능 확인)">
+                    <span class="gpu-dot"></span>
+                    <span id="gpu-engine-text">⚡ Vulkan / WebGPU</span>
+                    <span id="gpu-badge-fps" class="gpu-badge-fps">-- FPS</span>
+                </button>
+            </div>
+            <div class="top-bar-right">
+                <div class="topbar-style-wrap" title="3D 시각화 형태 즉시 전환 (막대, 원기둥, 파이, 도넛, 피라미드, 라인 등)">
+                    <span class="toolbar-icon topbar-style-icon" aria-hidden="true">🧊</span>
+                    <span class="topbar-style-label">3D:</span>
+                    <select id="quick-bar-style" class="topbar-style-select">
+                        <option value="auto">3D 자동 추천</option>
+                        <option value="box">📊 3D 입체 직육면체 막대</option>
+                        <option value="cylinder">● 3D 원기둥 타워 막대</option>
+                        <option value="donut">🍩 3D 도넛 링 차트</option>
+                        <option value="pie">🥧 3D 파이 슬라이스</option>
+                        <option value="pyramid">🔺 3D 피라미드 타워</option>
+                        <option value="line">📈 3D 입체 튜브 라인</option>
+                        <option value="area">🏔️ 3D 산악형 면적 차트</option>
+                        <option value="scatter">🌐 3D 입체 산점도</option>
+                        <option value="surface">🌊 3D 곡면 서피스</option>
+                    </select>
+                </div>
+                <button id="btn-auto-rotate" title="3D 자동 회전 뷰"><span class="toolbar-icon" aria-hidden="true">🔄</span> 회전</button>
+                <button id="btn-reset-camera" title="태블릿/모니터 화면 크기에 맞춰 3D 시점 자동 최적화"><span class="toolbar-icon" aria-hidden="true">🎥</span> 맞춤</button>
+                <button id="btn-iso-view" title="대각 입체 뷰"><span class="toolbar-icon" aria-hidden="true">📐</span> 아이소</button>
+                <button id="btn-top-view" title="위에서 보기"><span class="toolbar-icon" aria-hidden="true">⬆</span> 탑뷰</button>
+                <button id="btn-front-view" title="정면 보기"><span class="toolbar-icon" aria-hidden="true">◻</span> 정면</button>
+                <button id="btn-toggle-grid" title="그리드 토글"><span class="toolbar-icon" aria-hidden="true">▦</span> 그리드</button>
+                <button id="btn-toggle-labels" title="라벨 토글"><span class="toolbar-icon" aria-hidden="true">🏷</span> 라벨</button>
+                <button id="btn-toggle-timeline" title="시계열/다차원 타임슬라이더 플레이어"><span class="toolbar-icon" aria-hidden="true">⏳</span> 타임라인</button>
+                <button id="btn-screenshot" title="현재 3D 화면 고화질 PNG 이미지로 저장"><span class="toolbar-icon" aria-hidden="true">📸</span> 캡처</button>
+                <button id="btn-usage-guide" title="사용 방법 안내"><span class="toolbar-icon" aria-hidden="true">❔</span> 사용법</button>
+                <button id="btn-print-report" class="topbar-ai-report-btn" title="AI가 데이터를 정밀 분석하여 보고서를 자동으로 작성합니다">AI 자동 보고서</button>
+                <button id="btn-fullscreen" title="전체화면"><span class="toolbar-icon" aria-hidden="true">⛶</span></button>
+                <button id="btn-switch-to-desktop" class="platform-switch-btn" title="PC 컴퓨터 전체화면 대시보드로 이동"><span class="toolbar-icon">💻</span> PC버전</button>
+                <button id="btn-toggle-menu" class="menu-toggle-btn" title="대시보드 메뉴 열기/닫기"><span class="toolbar-icon" aria-hidden="true">☰</span> 메뉴</button>
+                <button id="theme-toggle" class="theme-toggle-btn" title="다크·라이트 모드 전환"><span class="toolbar-icon" aria-hidden="true">🌙</span> 다크 모드</button>
+            </div>
+        </header>
+        <!-- (여기에 index.html 의 나머지 섹션들을 그대로 삽입 – 생략된 부분) -->
+        <!-- 실제 내용은 기존 index.html 파일을 그대로 복사하면 됩니다 -->
+    </div>
+    <!-- ==== Mobile View (기존 mobile.html) ==== -->
+    <div class="mobile-view" style="display:none;">
+        <!-- 복사된 mobile.html 본문 시작 -->
+        <header id="system-info" class="system-info no-print" style="display: none !important;">
+            <div id="system-platform">🖥 플랫폼: 감지 중...</div>
+            <div id="system-manufacturer">🏭 GPU 제조사: 감지 중...</div>
+            <div id="system-cpu">⚙️ CPU 코어: 감지 중...</div>
+            <div id="system-gpu">🎮 GPU 모델: 감지 중...</div>
+            <div id="gpu-engine-info">⚡ 엔진: 감지 중...</div>
+        </header>
+        <!-- 1. 3D 뷰포트 메인 컨테이너 -->
+        <div id="canvas-container"></div>
+        <!-- 2. 상단 글로벌 컨트롤 바 (모바일 전용) -->
+        <header id="top-bar">
+            <div class="top-bar-left">
+                <h1>📊 3D 시각화 <span style="font-size:10px; color:#38bdf8; background:rgba(56,189,248,0.2); padding:1px 5px; border-radius:4px; font-weight:normal;">모바일</span></h1>
+                <span id="status-indicator" class="status offline">● 대기 중</span>
+                <button id="gpu-engine-badge" class="gpu-badge" title="GPU 가속 엔진 상태 및 실시간 FPS (클릭하여 사양 및 성능 확인)">
+                    <span class="gpu-dot"></span>
+                    <span id="gpu-engine-text">⚡ Vulkan / WebGPU</span>
+                    <span id="gpu-badge-fps" class="gpu-badge-fps">-- FPS</span>
+                </button>
+            </div>
+            <div class="top-bar-right">
+                <div class="topbar-style-wrap" title="3D 시각화 형태 즉시 전환 (막대, 원기둥, 파이, 도넛, 피라미드, 라인 등)">
+                    <span class="toolbar-icon topbar-style-icon" aria-hidden="true">🧊</span>
+                    <span class="topbar-style-label">3D:</span>
+                    <select id="quick-bar-style" class="topbar-style-select">
+                        <option value="auto">3D 자동 추천</option>
+                        <option value="box">📊 3D 입체 직육면체 막대</option>
+                        <option value="cylinder">● 3D 원기둥 타워 막대</option>
+                        <option value="donut">🍩 3D 도넛 링 차트</option>
+                        <option value="pie">🥧 3D 파이 슬라이스</option>
+                        <option value="pyramid">🔺 3D 피라미드 타워</option>
+                        <option value="line">📈 3D 입체 튜브 라인</option>
+                        <option value="area">🏔️ 3D 산악형 면적 차트</option>
+                        <option value="scatter">🌐 3D 입체 산점도</option>
+                        <option value="surface">🌊 3D 곡면 서피스</option>
+                    </select>
+                </div>
+                <button id="btn-auto-rotate" title="3D 자동 회전 뷰"><span class="toolbar-icon" aria-hidden="true">🔄</span> 회전</button>
+                <button id="btn-reset-camera" title="태블릿/모니터 화면 크기에 맞춰 3D 시점 자동 최적화"><span class="toolbar-icon" aria-hidden="true">🎥</span> 맞춤</button>
+                <button id="btn-iso-view" title="대각 입체 뷰"><span class="toolbar-icon" aria-hidden="true">📐</span> 아이소</button>
+                <button id="btn-top-view" title="위에서 보기"><span class="toolbar-icon" aria-hidden="true">⬆</span> 탑뷰</button>
+                <button id="btn-front-view" title="정면 보기"><span class="toolbar-icon" aria-hidden="true">◻</span> 정면</button>
+                <button id="btn-toggle-grid" title="그리드 토글"><span class="toolbar-icon" aria-hidden="true">▦</span> 그리드</button>
+                <button id="btn-toggle-labels" title="라벨 토글"><span class="toolbar-icon" aria-hidden="true">🏷</span> 라벨</button>
+                <button id="btn-toggle-timeline" title="시계열/다차원 타임슬라이더 플레이어"><span class="toolbar-icon" aria-hidden="true">⏳</span> 타임라인</button>
+                <button id="btn-screenshot" title="현재 3D 화면 고화질 PNG 이미지로 저장"><span class="toolbar-icon" aria-hidden="true">📸</span> 캡처</button>
+                <button id="btn-usage-guide" title="사용 방법 안내"><span class="toolbar-icon" aria-hidden="true">❔</span> 사용법</button>
+                <button id="btn-print-report" class="topbar-ai-report-btn" title="AI가 데이터를 정밀 분석하여 보고서를 자동으로 작성합니다">AI 자동 보고서</button>
+                <button id="btn-fullscreen" title="전체화면"><span class="toolbar-icon" aria-hidden="true">⛶</span></button>
+                <button id="btn-toggle-menu" class="menu-toggle-btn" title="대시보드 메뉴 열기/닫기"><span class="toolbar-icon" aria-hidden="true">☰</span> 메뉴</button>
+                <button id="theme-toggle" class="theme-toggle-btn" title="다크·라이트 모드 전환"><span class="toolbar-icon" aria-hidden="true">🌙</span> 다크 모드</button>
+            </div>
+        </header>
+        <!-- (mobile.html 의 나머지 섹션들을 그대로 삽입 – 생략) -->
+    </div>
+    <script src="js/main.js"></script>
+    <script src="js/main-mobile.js"></script>
+    <style>
+        /* 간단한 미디어 쿼리로 뷰 전환 */
+        @media (max-width: 768px) {
+            .desktop-view {display:none;}
+            .mobile-view {display:block;}
+        }
+        @media (min-width: 769px) {
+            .desktop-view {display:block;}
+            .mobile-view {display:none;}
+        }
+    </style>
+</body>
+</html>
