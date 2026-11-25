@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { $, appState, showToast } from './state.js';
 import { inferBest3DStyle, inferBestColorTheme } from './analytics.js';
 import { showDetailCard } from './chart2d.js';
@@ -17,6 +18,14 @@ let originalColor = null;
 let cameraAnim = null;
 let pointLight = null;
 
+// 저사양 경량 GLB 모델 캐시 및 실시간 부하 감지 상태
+let lowResBarGeometry = null;
+let lowResNodeGeometry = null;
+let lowResLoadPromise = null;
+let sceneInitTime = performance.now();
+let lowFpsStreak = 0;
+let severeLowFpsStreak = 0;
+
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 const tempVec = new THREE.Vector3();
@@ -24,6 +33,91 @@ const clock = new THREE.Clock();
 
 let lastFpsUpdateTime = performance.now();
 let frameCount = 0;
+
+/**
+ * 저사양 경량 GLB 모델(models/lowres/*.glb) 비동기 사전 로드 및 폴백 지오메트리 생성
+ */
+function getFallbackLowResBarGeometry() {
+    const geo = new THREE.CylinderGeometry(0.42, 0.42, 1, 6);
+    geo.translate(0, 0.5, 0);
+    geo.userData.isSharedLowRes = true;
+    return geo;
+}
+
+function getFallbackLowResNodeGeometry() {
+    const geo = new THREE.OctahedronGeometry(0.4, 0);
+    geo.userData.isSharedLowRes = true;
+    return geo;
+}
+
+function extractFirstMeshGeometry(gltfScene) {
+    let found = null;
+    gltfScene.traverse((child) => {
+        if (!found && child.isMesh && child.geometry) {
+            found = child.geometry.clone();
+            found.userData.isSharedLowRes = true;
+        }
+    });
+    return found;
+}
+
+export function preloadLowResModels() {
+    if (lowResLoadPromise) return lowResLoadPromise;
+    const loader = new GLTFLoader();
+    const barUrl = new URL('../models/lowres/model_low.glb', import.meta.url).href;
+    const nodeUrl = new URL('../models/lowres/node_low.glb', import.meta.url).href;
+
+    const loadOne = (url) => new Promise((resolve) => {
+        loader.load(
+            url,
+            (gltf) => resolve(extractFirstMeshGeometry(gltf.scene)),
+            undefined,
+            () => resolve(null)
+        );
+    });
+
+    lowResLoadPromise = Promise.all([loadOne(barUrl), loadOne(nodeUrl)]).then(([barGeo, nodeGeo]) => {
+        lowResBarGeometry = barGeo || getFallbackLowResBarGeometry();
+        lowResNodeGeometry = nodeGeo || getFallbackLowResNodeGeometry();
+        appState.lowResModelsLoaded = true;
+        console.log('[LowRes] GLB 모델 로드 완료:', {
+            barFromGlb: Boolean(barGeo),
+            nodeFromGlb: Boolean(nodeGeo)
+        });
+        if (appState.parsedData && (appState.lowSpecMode || appState.current3DStyle === 'lowres-model') && window.__applyVisualization) {
+            window.__applyVisualization();
+        }
+    });
+    return lowResLoadPromise;
+}
+
+function getLowResBarGeometry() {
+    if (!lowResBarGeometry) {
+        lowResBarGeometry = getFallbackLowResBarGeometry();
+        preloadLowResModels();
+    }
+    return lowResBarGeometry;
+}
+
+function getLowResNodeGeometry() {
+    if (!lowResNodeGeometry) {
+        lowResNodeGeometry = getFallbackLowResNodeGeometry();
+        preloadLowResModels();
+    }
+    return lowResNodeGeometry;
+}
+
+function createDataMaterial(color, extraOpts = {}) {
+    if (appState.lowSpecMode) {
+        return new THREE.MeshLambertMaterial({ color, ...extraOpts });
+    }
+    return new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.35,
+        metalness: 0.15,
+        ...extraOpts
+    });
+}
 
 /**
  * 3D 씬 및 WebGPURenderer 초기화
@@ -167,6 +261,16 @@ export async function initThreeScene() {
 
     // 초기 화면 크기 자동 최적화
     handleAdaptiveResize();
+    sceneInitTime = performance.now();
+
+    // 기기 사양 기반 초기 저사양/일반 모드 자동 적용 (고사양: 일반, 저사양: 3d-lite)
+    if (window.__getInitialLowSpecState) {
+        const initLowSpec = window.__getInitialLowSpecState();
+        appState.autoAdaptLowSpec = initLowSpec.autoAdapt;
+        if (initLowSpec.enabled) {
+            setLowSpecMode(true, initLowSpec.type, { initial: true });
+        }
+    }
 
     // 렌더 루프 가동
     animateLoop();
@@ -247,7 +351,7 @@ function updateDeviceLayoutClass(w, h, aspect) {
 export function clearScene() {
     appState.dataObjects.forEach(obj => {
         appState.scene.remove(obj);
-        if (obj.geometry) obj.geometry.dispose();
+        if (obj.geometry && !obj.geometry.userData?.isSharedLowRes) obj.geometry.dispose();
         if (obj.material) {
             if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
             else obj.material.dispose();
@@ -257,7 +361,7 @@ export function clearScene() {
 
     extraVisuals.forEach(obj => {
         appState.scene.remove(obj);
-        if (obj.geometry) obj.geometry.dispose();
+        if (obj.geometry && !obj.geometry.userData?.isSharedLowRes) obj.geometry.dispose();
         if (obj.material) obj.material.dispose();
     });
     extraVisuals = [];
@@ -395,6 +499,8 @@ export function render3DVisualization(labels, values) {
 
     if (isPie) {
         renderPieOrDonut(labels, values, maxVal, isDonut);
+    } else if (style === 'lowres-model') {
+        renderLowResModelColumns(labels, values, maxVal, maxH);
     } else if (style === 'scatter') {
         renderScatter(labels, values, maxVal, maxH);
     } else if (style === 'line') {
@@ -410,11 +516,44 @@ export function render3DVisualization(labels, values) {
     fitCameraToObjectBounds(count, style);
 }
 
+function renderLowResModelColumns(labels, values, maxVal, maxH) {
+    const count = labels.length;
+    const cols = Math.min(count, Math.ceil(Math.sqrt(count * 1.6)));
+    const rows = Math.ceil(count / cols);
+    const spacing = Math.max(1.5, Math.min(3.0, 20 / Math.max(cols, rows)));
+    const sharedGeo = getLowResBarGeometry();
+
+    labels.forEach((label, idx) => {
+        const val = values[idx];
+        const h = Math.max(0.15, (val / maxVal) * maxH);
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        const x = (col - (cols - 1) / 2) * spacing;
+        const z = (row - (rows - 1) / 2) * spacing;
+        const color = getThemeColor(idx, count);
+
+        const mat = new THREE.MeshLambertMaterial({ color });
+        const mesh = new THREE.Mesh(sharedGeo, mat);
+        mesh.scale.set(1, h, 1);
+        mesh.position.set(x, 0, z);
+        mesh.userData = { name: label, value: val, idx, color: color.clone() };
+
+        appState.scene.add(mesh);
+        appState.dataObjects.push(mesh);
+        createDomLabel(label, val, mesh, h);
+    });
+}
+
 function renderColumns(labels, values, maxVal, minVal, maxH, style) {
     const count = labels.length;
     const cols = Math.min(count, Math.ceil(Math.sqrt(count * 1.6)));
     const rows = Math.ceil(count / cols);
     const spacing = Math.max(1.5, Math.min(3.0, 20 / Math.max(cols, rows)));
+
+    if (appState.lowSpecMode && style === 'cylinder') {
+        renderLowResModelColumns(labels, values, maxVal, maxH);
+        return;
+    }
 
     labels.forEach((label, idx) => {
         const val = values[idx];
@@ -426,15 +565,11 @@ function renderColumns(labels, values, maxVal, minVal, maxH, style) {
         const color = getThemeColor(idx, count);
 
         let geo;
-        if (style === 'cylinder') geo = new THREE.CylinderGeometry(0.45, 0.45, h, appState.lowSpecMode ? 12 : 24);
+        if (style === 'cylinder') geo = new THREE.CylinderGeometry(0.45, 0.45, h, 24);
         else if (style === 'pyramid') geo = new THREE.ConeGeometry(0.65, h, 4);
         else geo = new THREE.BoxGeometry(0.75, h, 0.75);
 
-        const mat = new THREE.MeshStandardMaterial({
-            color,
-            roughness: 0.35,
-            metalness: 0.15
-        });
+        const mat = createDataMaterial(color);
 
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(x, h / 2, z);
@@ -511,8 +646,10 @@ function renderScatter(labels, values, maxVal, maxH) {
         const z = Math.sin(angle) * r;
         const color = getThemeColor(idx, count);
 
-        const geo = new THREE.SphereGeometry(0.4, appState.lowSpecMode ? 10 : 20, appState.lowSpecMode ? 10 : 20);
-        const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 });
+        const geo = appState.lowSpecMode
+            ? getLowResNodeGeometry()
+            : new THREE.SphereGeometry(0.4, 20, 20);
+        const mat = createDataMaterial(color);
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(x, h, z);
         mesh.userData = { name: label, value: val, idx, color: color.clone() };
@@ -542,10 +679,12 @@ function renderTubeLine(labels, values, maxVal, maxH) {
         const x = (idx - (count - 1) / 2) * spacing;
         points.push(new THREE.Vector3(x, h, 0));
 
-        // 데이터 노드 스피어
+        // 데이터 노드 스피어 (저사양 모드에서는 초경량 node_low.glb 사용)
         const color = getThemeColor(idx, count);
-        const nodeGeo = new THREE.SphereGeometry(0.35, appState.lowSpecMode ? 8 : 16, appState.lowSpecMode ? 8 : 16);
-        const nodeMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 });
+        const nodeGeo = appState.lowSpecMode
+            ? getLowResNodeGeometry()
+            : new THREE.SphereGeometry(0.35, 16, 16);
+        const nodeMat = createDataMaterial(color);
         const node = new THREE.Mesh(nodeGeo, nodeMat);
         node.position.set(x, h, 0);
         node.userData = { name: label, value: val, idx, color: color.clone() };
@@ -638,20 +777,17 @@ function renderSurfaceGrid(labels, values, maxVal, maxH) {
     }
     geo.computeVertexNormals();
 
-    const mat = new THREE.MeshStandardMaterial({
-        color: 0x4f46e5,
-        roughness: 0.35,
-        metalness: 0.25,
-        side: THREE.DoubleSide
-    });
+    const mat = createDataMaterial(0x4f46e5, { side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geo, mat);
     appState.scene.add(mesh);
     extraVisuals.push(mesh);
 
-    const wireMat = new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true, transparent: true, opacity: 0.4 });
-    const wireMesh = new THREE.Mesh(geo, wireMat);
-    appState.scene.add(wireMesh);
-    extraVisuals.push(wireMesh);
+    if (!appState.lowSpecMode) {
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true, transparent: true, opacity: 0.4 });
+        const wireMesh = new THREE.Mesh(geo, wireMat);
+        appState.scene.add(wireMesh);
+        extraVisuals.push(wireMesh);
+    }
 
     labels.forEach((label, idx) => {
         const val = values[idx];
@@ -662,8 +798,10 @@ function renderSurfaceGrid(labels, values, maxVal, maxH) {
         const z = (row - (rows - 1) / 2) * spacing;
         const color = getThemeColor(idx, count);
 
-        const nodeGeo = new THREE.SphereGeometry(0.3, 16, 16);
-        const nodeMat = new THREE.MeshStandardMaterial({ color, roughness: 0.3, metalness: 0.2 });
+        const nodeGeo = appState.lowSpecMode
+            ? getLowResNodeGeometry()
+            : new THREE.SphereGeometry(0.3, 16, 16);
+        const nodeMat = createDataMaterial(color);
         const node = new THREE.Mesh(nodeGeo, nodeMat);
         node.position.set(x, h, z);
         node.userData = { name: label, value: val, idx, color: color.clone() };
@@ -939,6 +1077,25 @@ function animateLoop() {
         if (badgeFps) badgeFps.textContent = `${measuredFps} FPS`;
 
         if (window.__updateGpuModalLive) window.__updateGpuModalLive();
+
+        // 실시간 부하 감지 및 자동 저사양 모델 전환 (초기 3초 워밍업 이후, 백그라운드 탭 제외)
+        if (!document.hidden && now - sceneInitTime > 3000 && appState.autoAdaptLowSpec && !appState.lowSpecManualOverride) {
+            if (!appState.lowSpecMode) {
+                const isLagging = measuredFps > 0 && (measuredFps < 24 || (appState.dataObjects.length > 100 && measuredFps < 30));
+                lowFpsStreak = isLagging ? lowFpsStreak + 1 : Math.max(0, lowFpsStreak - 1);
+                if (lowFpsStreak >= 12) {
+                    lowFpsStreak = 0;
+                    setLowSpecMode(true, '3d-lite', { autoTriggered: true });
+                }
+            } else if (appState.lowSpecType === '3d-lite') {
+                const isSevereLag = measuredFps > 0 && measuredFps < 14;
+                severeLowFpsStreak = isSevereLag ? severeLowFpsStreak + 1 : Math.max(0, severeLowFpsStreak - 1);
+                if (severeLowFpsStreak >= 20) {
+                    severeLowFpsStreak = 0;
+                    setLowSpecMode(true, '2d-only', { autoTriggered: true });
+                }
+            }
+        }
     }
 
     // 저사양 2D 전용 모드일 경우 3D 렌더링을 일시 정지하여 GPU 부하 0% 유지
@@ -956,22 +1113,47 @@ function animateLoop() {
 }
 
 /**
- * 저사양 최적화 모드 제어 (3D 경량화 / 2D 전용 전환)
+ * 저사양 최적화 모드 제어 (3D 경량 모델 / 2D 전용 전환)
  */
-export function setLowSpecMode(enabled, type = '3d-lite') {
+export function setLowSpecMode(enabled, type = '3d-lite', options = {}) {
     appState.lowSpecMode = enabled;
     appState.lowSpecType = type;
-    try {
-        localStorage.setItem('lowSpecMode', enabled ? 'true' : 'false');
-        localStorage.setItem('lowSpecType', type);
-    } catch (e) {}
+
+    if (options.manual) {
+        appState.lowSpecManualOverride = !enabled;
+    }
+
+    if (!options.autoTriggered) {
+        try {
+            localStorage.setItem('lowSpecMode', enabled ? 'true' : 'false');
+            localStorage.setItem('lowSpecType', type);
+        } catch (e) {}
+    }
+
+    if (enabled) {
+        preloadLowResModels();
+    }
+
+    // 씬 환경 부하 제어 (저사양 모드 시 안개 및 포인트 라이트 비활성화)
+    if (appState.scene) {
+        if (enabled) {
+            appState.scene.fog = null;
+        } else {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const fogHex = isDark ? 0x0f172a : 0xf1f5f9;
+            appState.scene.fog = new THREE.FogExp2(fogHex, 0.015);
+        }
+    }
+    if (pointLight) {
+        pointLight.intensity = enabled ? 0 : 0.5;
+    }
 
     const btn = $('btn-lowspec-toggle');
     const label = $('lowspec-btn-label');
     if (btn) {
         btn.classList.toggle('active', enabled);
         if (label) label.textContent = enabled ? '⚡ 저사양 ON' : '⚡ 저사양 모드';
-        btn.setAttribute('title', enabled ? '저사양 모드 활성화됨 (클릭하여 끄기)' : '저사양 기기 렉 방지 및 최적화 모드');
+        btn.setAttribute('title', enabled ? '저사양 모델 활성화됨 (클릭하여 일반 모드 복원)' : '저사양 기기 렉 방지 및 경량 모델 모드');
     }
 
     const menuCheckbox = $('menu-lowspec-toggle');
@@ -989,7 +1171,11 @@ export function setLowSpecMode(enabled, type = '3d-lite') {
         if (window.__renderLowSpecChartWithData) {
             window.__renderLowSpecChartWithData();
         }
-        showToast('⚡ <strong>초경량 2D 모드 적용</strong>: 3D 가속을 중단하고 100% 렉 없는 2D 대시보드로 작동합니다.');
+        if (options.autoTriggered) {
+            showToast('⚡ <strong>극심한 부하 감지 — 초경량 2D 모드 전환</strong>: 렉 없이 사용하실 수 있도록 2D 차트 모드로 전환했습니다.');
+        } else if (!options.initial) {
+            showToast('⚡ <strong>초경량 2D 모드 적용</strong>: 3D 가속을 중단하고 100% 렉 없는 2D 대시보드로 작동합니다.');
+        }
     } else {
         if (lowspecCard) lowspecCard.style.display = 'none';
         if (canvasContainer) canvasContainer.style.display = 'block';
@@ -998,13 +1184,17 @@ export function setLowSpecMode(enabled, type = '3d-lite') {
             window.__applyVisualization();
         }
         if (enabled) {
-            showToast('⚡ <strong>3D 라이트 모드 적용</strong>: 해상도 1.0x 제한, 폴리곤 및 그림자 최적화로 렉을 방지합니다.');
-        } else {
-            showToast('🧊 <strong>표준 고화질 3D 모드 복원</strong>: 고해상도 안티앨리어싱 및 디테일이 복원되었습니다.');
+            if (options.autoTriggered) {
+                showToast('⚡ <strong>과부하 감지 — 저사양 3D 모델 자동 적용</strong>: 프레임 저하(렉)가 감지되어 경량 GLB 모델 및 3D 최적화 모드로 전환했습니다.');
+            } else if (!options.initial) {
+                showToast('⚡ <strong>3D 저사양 모델 모드 적용</strong>: 경량 GLB 모델, 해상도 1.0x 제한 및 셰이더 최적화로 렉을 방지합니다.');
+            }
+        } else if (!options.initial) {
+            showToast('🧊 <strong>표준 고화질 3D 모드 복원</strong>: 고해상도 안티앨리어싱 및 표준 모델이 복원되었습니다.');
         }
     }
 
-    window.dispatchEvent(new CustomEvent('lowspecchange', { detail: { enabled, type } }));
+    window.dispatchEvent(new CustomEvent('lowspecchange', { detail: { enabled, type, autoTriggered: Boolean(options.autoTriggered) } }));
 }
 window.__setLowSpecMode = setLowSpecMode;
 

@@ -10,7 +10,7 @@
  */
 
 // 캐시 스토리지 고유 버전명 (리소스 업데이트 시 버전 변경)
-const CACHE_NAME = '3d-vis-cache-v11';
+const CACHE_NAME = '3d-vis-cache-v12';
 
 // 오프라인 상태에서도 동작할 수 있도록 사전 캐싱할 핵심 정적 자산 목록
 const ASSETS_TO_CACHE = [
@@ -18,6 +18,9 @@ const ASSETS_TO_CACHE = [
   './index.html',        // 메인 HTML 마크업
   './style.css',         // 대시보드 및 3D UI 스타일시트
   './main.js',           // Three.js 엔진, 데이터 분석, UI 상호작용 메인 스크립트
+  './lowspec.js',        // 저사양 기기 감지 및 최적화 스크립트
+  './models/lowres/model_low.glb', // 저사양 3D 막대 경량 GLB 모델
+  './models/lowres/node_low.glb',  // 저사양 3D 노드 경량 GLB 모델
   './manifest.json',     // 웹 앱 매니페스트 (모바일 홈화면 설치 정보)
   './icon-192.png',      // 192x192 모바일 앱 아이콘
   './icon-512.png'       // 512x512 고해상도 앱 아이콘

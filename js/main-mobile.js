@@ -50,6 +50,10 @@ export function applyVisualization() {
     const res = render2DChart();
     if (res && res.labels && res.values) {
         render3DVisualization(res.labels, res.values);
+        if (window.__renderLowSpecChartWithData) {
+            const yName = appState.parsedData.headers[appState.analysisResult?.bestYCol || 1] || '지표';
+            window.__renderLowSpecChartWithData(res.labels, res.values, yName);
+        }
     }
     if (appState.analysisResult) {
         updateTimePlayerUI();

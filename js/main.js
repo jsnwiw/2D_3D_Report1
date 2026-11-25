@@ -303,6 +303,15 @@ function bindFilterAndOptionEvents() {
  * 🚀 애플리케이션 진입점 (Bootstrap)
  */
 async function bootstrapApp() {
+    // 저사양 상태 초기화 (localStorage 기반) – 페이지 로드 초기에 전역 상태 설정
+    if (window.__initLowSpecStateOnLoad) {
+        window.__initLowSpecStateOnLoad();
+        console.log('[LowSpec] 초기 상태 적용:', {
+            mode: appState.lowSpecMode,
+            type: appState.lowSpecType,
+            autoAdapt: appState.autoAdaptLowSpec
+        });
+    }
     try {
         console.log('🚀 3D 데이터 시각화 웹 플랫폼 모듈 로드 시작...');
 
