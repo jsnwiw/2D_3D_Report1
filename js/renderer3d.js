@@ -1197,6 +1197,7 @@ export function setLowSpecMode(enabled, type = '3d-lite', options = {}) {
     window.dispatchEvent(new CustomEvent('lowspecchange', { detail: { enabled, type, autoTriggered: Boolean(options.autoTriggered) } }));
 }
 window.__setLowSpecMode = setLowSpecMode;
+window.__rendererSetLowSpecMode = setLowSpecMode;
 
 /**
  * 카메라 프리셋 버튼 바인딩
