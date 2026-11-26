@@ -957,6 +957,35 @@ html[data-theme="light"] .usage-guide-secondary {
   font-weight: 600 !important;
 }
 
+html[data-theme="light"] .usage-guide-workflow {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: rgba(99, 102, 241, 0.25) !important;
+}
+
+html[data-theme="light"] .ug-flow-chip {
+  background: rgba(79, 70, 229, 0.12) !important;
+  color: #4338ca !important;
+}
+
+html[data-theme="light"] .usage-guide-tab {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .usage-guide-tab.active {
+  background: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] .usage-guide-steps code,
+html[data-theme="light"] .usage-guide-steps kbd {
+  background: #eef2ff !important;
+  border-color: #c7d2fe !important;
+  color: #4338ca !important;
+}
+
 /* 모바일 전용 빠른 메뉴바 */
 html[data-theme="light"] #mobile-action-bar {
   background: rgba(255, 255, 255, 0.96) !important;
@@ -1969,6 +1998,35 @@ html[data-theme="dark"] .usage-guide-secondary {
   background: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   font-weight: 600 !important;
+}
+
+html[data-theme="dark"] .usage-guide-workflow {
+  background: rgba(15, 23, 42, 0.65) !important;
+  border-color: rgba(192, 132, 252, 0.3) !important;
+}
+
+html[data-theme="dark"] .ug-flow-chip {
+  background: rgba(124, 58, 237, 0.28) !important;
+  color: #f3e8ff !important;
+}
+
+html[data-theme="dark"] .usage-guide-tab {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .usage-guide-tab.active {
+  background: #7c3aed !important;
+  border-color: #a855f7 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] .usage-guide-steps code,
+html[data-theme="dark"] .usage-guide-steps kbd {
+  background: rgba(124, 58, 237, 0.25) !important;
+  border-color: rgba(192, 132, 252, 0.4) !important;
+  color: #f3e8ff !important;
 }
 
 /* 모바일 전용 빠른 메뉴바 */

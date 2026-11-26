@@ -5,3 +5,10 @@ setup_and_test.ps1
 chrome-debug/
 # Chrome DevToolsActivePort 파일 (디버깅 시 생성)
 DevToolsActivePort
+
+# 배포에서 제외할 발표 자료 및 PPT 생성 스크립트
+*.pptx
+~$*.pptx
+발표대본.*
+create_ppt.py
+create_ppt.ps1

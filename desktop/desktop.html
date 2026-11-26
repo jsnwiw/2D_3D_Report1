@@ -614,64 +614,143 @@
         </div>
     </div>
 
-    <!-- 사용 방법 안내 모달 -->
+    <!-- 사용 방법 안내 모달 (리뉴얼 v2.5) -->
     <div id="usage-guide-modal" class="modal-backdrop usage-guide-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="usage-guide-title" aria-describedby="usage-guide-summary">
         <section class="modal-card usage-guide-card" tabindex="-1">
             <div class="modal-header">
                 <div class="modal-title">
                     <span class="modal-icon" aria-hidden="true">📖</span>
                     <div>
-                        <h3 id="usage-guide-title">3D 데이터 시각화 사용 방법</h3>
-                        <p id="usage-guide-summary" class="usage-guide-subtitle">파일을 불러와 차트를 살펴보고 보고서로 저장하세요.</p>
+                        <h3 id="usage-guide-title">3D 데이터 시각화 &amp; AI 보고서 사용 가이드</h3>
+                        <p id="usage-guide-summary" class="usage-guide-subtitle">데이터 업로드부터 3D/2D 탐색, 4단계 AI 심층 보고서 저장까지 한눈에 확인하세요.</p>
                     </div>
                 </div>
                 <button type="button" id="btn-close-usage-guide" class="modal-close-btn" aria-label="사용 방법 안내 닫기" title="닫기">&times;</button>
             </div>
             <div class="usage-guide-body">
-                <ol class="usage-guide-steps">
-                    <li>
-                        <span class="usage-guide-step-number">1</span>
-                        <div>
-                            <h4>데이터 불러오기</h4>
-                            <p>CSV 또는 Excel(.xlsx, .xls) 파일을 선택하거나 화면에 놓으세요. 한글이 깨지면 인코딩에서 CP949/EUC-KR을 선택합니다.</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="usage-guide-step-number">2</span>
-                        <div>
-                            <h4>차트 살펴보기</h4>
-                            <p>화면을 드래그해 회전하고 휠이나 두 손가락으로 확대·축소하세요. 상단의 맞춤 버튼은 화면에 맞는 시점으로 돌아갑니다.</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="usage-guide-step-number">3</span>
-                        <div>
-                            <h4>표시와 데이터 조정</h4>
-                            <p>상단 버튼이나 메뉴에서 차트 형태, 라벨, 그리드, 정렬과 필터를 조정하세요. 차트 항목을 선택하면 상세 값을 볼 수 있습니다.</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="usage-guide-step-number">4</span>
-                        <div>
-                            <h4>타임라인 재생</h4>
-                            <p>시간이나 여러 수치 열이 있는 데이터는 타임라인을 열어 단계별 변화를 재생하고 비교할 수 있습니다.</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="usage-guide-step-number">5</span>
-                        <div>
-                            <h4>보고서 작성·저장</h4>
-                            <p>AI 자동 보고서에서 보고서를 작성한 뒤 인쇄 / PDF 저장을 누르고, 인쇄 창의 대상에서 PDF로 저장을 선택하세요.</p>
-                        </div>
-                    </li>
-                </ol>
+                <div class="usage-guide-workflow" aria-label="핵심 사용 순서">
+                    <span class="ug-flow-chip">1. 파일 업로드</span>
+                    <span class="ug-flow-arrow" aria-hidden="true">→</span>
+                    <span class="ug-flow-chip">2. 3D·2D 탐색</span>
+                    <span class="ug-flow-arrow" aria-hidden="true">→</span>
+                    <span class="ug-flow-chip">3. AI 깊이 선택</span>
+                    <span class="ug-flow-arrow" aria-hidden="true">→</span>
+                    <span class="ug-flow-chip">4. PDF 저장</span>
+                </div>
+
+                <div class="usage-guide-tabs" role="tablist" aria-label="가이드 카테고리">
+                    <button type="button" class="usage-guide-tab active" role="tab" aria-selected="true" data-guide-tab="quickstart">🚀 빠른 시작</button>
+                    <button type="button" class="usage-guide-tab" role="tab" aria-selected="false" data-guide-tab="aireport">🔬 AI 보고서 스튜디오</button>
+                    <button type="button" class="usage-guide-tab" role="tab" aria-selected="false" data-guide-tab="controls">🎮 3D 조작 &amp; 성능</button>
+                </div>
+
+                <div class="usage-guide-panel active" role="tabpanel" data-guide-panel="quickstart">
+                    <ol class="usage-guide-steps">
+                        <li>
+                            <span class="usage-guide-step-number">1</span>
+                            <div>
+                                <h4>데이터 업로드 &amp; 인코딩</h4>
+                                <p><strong>CSV / Excel(.xlsx, .xls)</strong> 파일을 선택하거나 화면에 드래그하세요. 한글이 깨지면 인코딩에서 <code>CP949 / EUC-KR</code>을 선택합니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">2</span>
+                            <div>
+                                <h4>3D 차트 &amp; 2D 대시보드 탐색</h4>
+                                <p>3D 객체를 클릭하면 2D 차트와 상세 값이 연동됩니다. 상단 <strong>3D 스타일</strong> 셀렉터에서 막대·원기둥·파이·튜브 라인 등 10종을 즉시 전환할 수 있습니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">3</span>
+                            <div>
+                                <h4>축·필터·타임라인 제어</h4>
+                                <p>우측 <strong>메뉴(☰)</strong>에서 X/Y축, 정렬, 범위 필터를 조정하세요. 시계열·다차원 데이터는 <strong>타임라인(⏳)</strong>으로 단계별 변화를 재생할 수 있습니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">4</span>
+                            <div>
+                                <h4>AI 보고서 작성 &amp; PDF 저장</h4>
+                                <p><strong>AI 자동 보고서</strong> 또는 <strong>바로 쓰기</strong>를 누르고 분석 깊이를 고른 뒤, <strong>인쇄 / PDF 저장</strong>으로 A4 보고서를 완성하세요.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="usage-guide-panel" role="tabpanel" data-guide-panel="aireport" hidden>
+                    <ol class="usage-guide-steps">
+                        <li>
+                            <span class="usage-guide-step-number">1</span>
+                            <div>
+                                <h4>1단계 표준 요약 &amp; 2단계 심층 상세</h4>
+                                <p><strong>표준 요약</strong>은 핵심 KPI와 추세를 빠르게 정리하며, <strong>심층 상세</strong>는 사분위수(Q1~Q3), IQR, 피어슨 상관계수(<code>r</code>), HHI 집중도를 추가합니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">2</span>
+                            <div>
+                                <h4>3단계 컨설팅 &amp; 4단계 종합 감사</h4>
+                                <p><strong>컨설팅 심화</strong>는 Top/Bottom 비교표와 이탈 민감도·What-If 시뮬레이션을, <strong>종합 감사</strong>는 P10~P90 백분위와 Z-Score 이상치까지 진단합니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">3</span>
+                            <div>
+                                <h4>직접 편집 &amp; 클립보드 복사</h4>
+                                <p>생성된 A4 보고서는 <strong>직접 편집(✏️)</strong>으로 문구를 수정하거나 <strong>복사(📋)</strong> 버튼으로 문서·메일에 바로 붙여넣을 수 있습니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">4</span>
+                            <div>
+                                <h4>Gemini / OpenAI 프롬프트 연동</h4>
+                                <p>외부 LLM 키가 연결된 경우 확장된 통계 지표를 프롬프트에 자동 반영해 더욱 풍부한 전략 문장을 생성합니다.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="usage-guide-panel" role="tabpanel" data-guide-panel="controls" hidden>
+                    <ol class="usage-guide-steps">
+                        <li>
+                            <span class="usage-guide-step-number">1</span>
+                            <div>
+                                <h4>마우스 &amp; 터치 시점 조작</h4>
+                                <p><kbd>좌클릭 드래그</kbd> 회전 · <kbd>휠 / 두 손가락</kbd> 확대·축소 · <kbd>우클릭 드래그</kbd> 이동. 상단 <strong>맞춤(🎥)</strong>으로 최적 시점을 복원합니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">2</span>
+                            <div>
+                                <h4>WebGPU 가속 &amp; 저사양 모드</h4>
+                                <p>상단 <strong>⚡ Vulkan / WebGPU</strong> 뱃지에서 실시간 FPS를 확인하세요. 사양이 낮거나 버벅이면 <strong>⚡ 저사양 모드</strong>로 경량 3D 또는 2D 차트로 전환됩니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">3</span>
+                            <div>
+                                <h4>고화질 캡처 &amp; 테마 전환</h4>
+                                <p><strong>캡처(📸)</strong>로 현재 3D 화면을 PNG로 저장하고, <strong>다크·라이트 모드(🌙)</strong>로 작업 환경에 맞춰 테마를 전환할 수 있습니다.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="usage-guide-step-number">4</span>
+                            <div>
+                                <h4>패치 노트 &amp; PC/모바일 최적화</h4>
+                                <p><strong>패치 노트(📝)</strong>에서 최신 업데이트 내역을 확인할 수 있으며, 상단 툴바는 마우스 휠로 좌우 스크롤이 가능합니다.</p>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+
                 <div class="usage-guide-tip">
-                    <strong>빠른 순서</strong>
-                    <span>파일 선택 → 차트 확인 → AI 보고서 작성 → PDF 저장</span>
+                    <strong>💡 추천 팁</strong>
+                    <span>처음 사용하신다면 데이터 업로드 후 <strong>✨ AI 자동 보고서 바로 쓰기</strong>를 누르고, <strong>🔬 분석 깊이</strong>를 바꿔가며 차이를 비교해 보세요!</span>
                 </div>
             </div>
             <div class="usage-guide-actions">
                 <button type="button" id="btn-usage-guide-file" class="usage-guide-primary">📁 데이터 파일 선택</button>
+                <button type="button" id="btn-usage-guide-report" class="usage-guide-secondary">📑 AI 보고서 열기</button>
                 <button type="button" id="btn-close-usage-guide-bottom" class="usage-guide-secondary">닫기</button>
             </div>
         </section>

@@ -354,7 +354,29 @@ export function setupTopBarActions() {
     const btnCloseUsageGuide = $('btn-close-usage-guide');
     const btnCloseUsageGuideBottom = $('btn-close-usage-guide-bottom');
     const btnUsageGuideFile = $('btn-usage-guide-file');
+    const btnUsageGuideReport = $('btn-usage-guide-report');
+    const usageGuideTabs = [...document.querySelectorAll('.usage-guide-tab')];
+    const usageGuidePanels = [...document.querySelectorAll('.usage-guide-panel')];
     let usageGuideReturnFocus = null;
+
+    const switchUsageGuideTab = (tabName) => {
+        usageGuideTabs.forEach(tab => {
+            const isTarget = tab.dataset.guideTab === tabName;
+            tab.classList.toggle('active', isTarget);
+            tab.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+        });
+        usageGuidePanels.forEach(panel => {
+            const isTarget = panel.dataset.guidePanel === tabName;
+            panel.classList.toggle('active', isTarget);
+            panel.hidden = !isTarget;
+        });
+    };
+
+    usageGuideTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            if (tab.dataset.guideTab) switchUsageGuideTab(tab.dataset.guideTab);
+        });
+    });
 
     const closeUsageGuide = () => {
         if (!usageGuideModal || usageGuideModal.style.display === 'none') return;
@@ -369,6 +391,7 @@ export function setupTopBarActions() {
     const openUsageGuide = () => {
         if (!usageGuideModal) return;
         usageGuideReturnFocus = document.activeElement;
+        switchUsageGuideTab('quickstart');
         usageGuideModal.style.display = 'flex';
         usageGuideModal.setAttribute('aria-hidden', 'false');
         btnCloseUsageGuide?.focus();
@@ -380,6 +403,10 @@ export function setupTopBarActions() {
     btnUsageGuideFile?.addEventListener('click', () => {
         closeUsageGuide();
         $('csv-upload')?.click();
+    });
+    btnUsageGuideReport?.addEventListener('click', () => {
+        closeUsageGuide();
+        $('btn-print-report')?.click();
     });
     usageGuideModal?.addEventListener('click', event => {
         if (event.target === usageGuideModal) closeUsageGuide();
