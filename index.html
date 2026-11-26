@@ -778,6 +778,18 @@
                         </select>
                     </div>
 
+                    <!-- 3-1. 분석 깊이 선택 -->
+                    <div class="ai-control-item">
+                        <div class="ai-control-label-row">
+                            <label for="ai-report-depth">🔬 분석 깊이</label>
+                            <span class="ai-badge-pill subtle">상세 / 요약</span>
+                        </div>
+                        <select id="ai-report-depth" class="ai-toolbar-select">
+                            <option value="detailed" selected>🔬 심층 상세 분석 (다변량·분포·로드맵)</option>
+                            <option value="standard">⚡ 표준 요약 분석</option>
+                        </select>
+                    </div>
+
                     <!-- 4. 액션 버튼 그룹 -->
                     <div class="ai-toolbar-btn-group">
                         <button type="button" id="btn-ai-api-settings" class="report-btn-subtle" title="LLM API 키 설정">

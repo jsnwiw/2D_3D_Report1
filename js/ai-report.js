@@ -276,6 +276,7 @@ export async function generateAIReport(options = {}) {
         const typeLabel = aiReportType?.selectedOptions?.[0]?.textContent || '종합 경영·비즈니스 전략 보고서';
         const tone = aiReportTone ? aiReportTone.value : 'formal';
         const engine = aiReportEngine ? aiReportEngine.value : 'builtin';
+        const depth = $('ai-report-depth')?.value || 'detailed';
 
         if (aiGenerationProgress) aiGenerationProgress.style.display = 'block';
         setReportProgress(20, '1단계: 데이터셋 구조 및 8대 기술통계 지표 산출 중...');
@@ -380,16 +381,40 @@ export async function generateAIReport(options = {}) {
             recommendRow.style.display = 'flex';
         }
 
+        const aboveMeanCount = values.filter(v => v >= mean).length;
+        const aboveMeanPct = count > 0 ? ((aboveMeanCount / count) * 100).toFixed(1) : '0';
+        const hhi = sum > 0
+            ? Math.round(values.reduce((acc, v) => acc + Math.pow((v / sum) * 100, 2), 0))
+            : 0;
+
         let multiColAnalysis = null;
         const otherNumCols = appState.analysisResult.numericCols ? appState.analysisResult.numericCols.filter(ci => ci !== yIdx && ci !== xIdx) : [];
         if (otherNumCols.length > 0) {
-            const otherColNames = otherNumCols.map(ci => appState.parsedData.headers[ci]);
+            const correlations = otherNumCols.map(ci => {
+                const name = appState.parsedData.headers[ci];
+                const pairs = rows
+                    .map(r => [parseFloat(r[yIdx]), parseFloat(r[ci])])
+                    .filter(([a, b]) => !isNaN(a) && !isNaN(b));
+                let rVal = null;
+                if (pairs.length >= 3) {
+                    const mx = pairs.reduce((s, p) => s + p[0], 0) / pairs.length;
+                    const my = pairs.reduce((s, p) => s + p[1], 0) / pairs.length;
+                    let num = 0, dx = 0, dy = 0;
+                    for (const [a, b] of pairs) {
+                        num += (a - mx) * (b - my);
+                        dx += (a - mx) ** 2;
+                        dy += (b - my) ** 2;
+                    }
+                    rVal = (dx > 0 && dy > 0) ? (num / Math.sqrt(dx * dy)) : 0;
+                }
+                const s = appState.analysisResult.numericStats[name];
+                return { name, sum: s?.sum || 0, mean: s?.mean || 0, r: rVal };
+            });
+            const otherColNames = correlations.map(c => c.name);
             multiColAnalysis = {
                 names: otherColNames,
-                info: otherColNames.map(name => {
-                    const s = appState.analysisResult.numericStats[name];
-                    return s ? `${name}(총합: ${fmt(s.sum || 0)}, 평균: ${fmt(Math.round(s.mean || 0))})` : name;
-                }).join(', ')
+                correlations,
+                info: correlations.map(c => `${c.name}(총합: ${fmt(c.sum)}, 평균: ${fmt(Math.round(c.mean))}${c.r !== null ? `, 상관계수 r=${c.r.toFixed(2)}` : ''})`).join(', ')
             };
         }
 
@@ -405,8 +430,9 @@ export async function generateAIReport(options = {}) {
                 try {
                     setReportProgress(85, 'Google Gemini LLM에 데이터를 전송하여 보고서를 생성하는 중...');
                     aiGeneratedSections = await callGeminiReportAPI(geminiKey, {
-                        type: resolvedType, typeLabel: resolvedTypeLabel, tone: resolvedTone, toneLabel: resolvedToneLabel, xColName, yColName, count, sum, mean, median, min, max, stddev, cv,
-                        top1, top20Count, top20Share, outliers, bottom1, topBottomRatio,
+                        type: resolvedType, typeLabel: resolvedTypeLabel, tone: resolvedTone, toneLabel: resolvedToneLabel, depth, xColName, yColName, count, sum, mean, median, min, max, stddev, cv,
+                        q1, q3, iqr, aboveMeanCount, aboveMeanPct, hhi, multiColAnalysis,
+                        top1, top2, top3, top20Count, top20Share, outliers, bottom1, bottom2, topBottomRatio,
                         fileName: appState.currentUploadedFile ? appState.currentUploadedFile.name : '데이터세트'
                     });
                     usedEngineLabel = '🌐 Google Gemini 1.5 Flash (LLM)';
@@ -423,8 +449,9 @@ export async function generateAIReport(options = {}) {
                 try {
                     setReportProgress(85, 'OpenAI GPT에 데이터를 전송하여 보고서를 생성하는 중...');
                     aiGeneratedSections = await callOpenAIReportAPI(openaiKey, {
-                        type: resolvedType, typeLabel: resolvedTypeLabel, tone: resolvedTone, toneLabel: resolvedToneLabel, xColName, yColName, count, sum, mean, median, min, max, stddev, cv,
-                        top1, top20Count, top20Share, outliers, bottom1, topBottomRatio,
+                        type: resolvedType, typeLabel: resolvedTypeLabel, tone: resolvedTone, toneLabel: resolvedToneLabel, depth, xColName, yColName, count, sum, mean, median, min, max, stddev, cv,
+                        q1, q3, iqr, aboveMeanCount, aboveMeanPct, hhi, multiColAnalysis,
+                        top1, top2, top3, top20Count, top20Share, outliers, bottom1, bottom2, topBottomRatio,
                         fileName: appState.currentUploadedFile ? appState.currentUploadedFile.name : '데이터세트'
                     });
                     usedEngineLabel = '🌐 OpenAI GPT-4o-mini (LLM)';
@@ -439,10 +466,17 @@ export async function generateAIReport(options = {}) {
 
         if (!aiGeneratedSections) {
             aiGeneratedSections = buildBuiltinAIReport({
-                type: resolvedType, typeLabel: resolvedTypeLabel, tone: resolvedTone, toneLabel: resolvedToneLabel, xColName, yColName, count, sum, mean, median, min, max, range, stddev, cv,
+                type: resolvedType, typeLabel: resolvedTypeLabel, tone: resolvedTone, toneLabel: resolvedToneLabel, depth, xColName, yColName, count, sum, mean, median, min, max, range, stddev, cv,
                 top1, top2, top3, bottom1, bottom2, top20Count, top20Sum, top20Share, top1Share, top3Share, topBottomRatio,
+                aboveMeanCount, aboveMeanPct, hhi,
                 outliers, highOutliers, lowOutliers, q1, q3, iqr, upperLimit, lowerLimit, sortedDesc, multiColAnalysis,
                 fileName: appState.currentUploadedFile ? appState.currentUploadedFile.name : (fileNameDisplay?.textContent || '데이터 세트')
+            });
+        } else if (depth === 'detailed' && !aiGeneratedSections.detailedBreakdownHtml) {
+            aiGeneratedSections.detailedBreakdownHtml = buildDetailedBreakdownHtml({
+                tone: resolvedTone, xColName, yColName, count, sum, mean, median, q1, q3, iqr,
+                top1, top2, top3, bottom1, bottom2, top20Share, topBottomRatio,
+                aboveMeanCount, aboveMeanPct, hhi, outliers, multiColAnalysis, sortedDesc
             });
         }
 
@@ -597,6 +631,16 @@ export async function generateAIReport(options = {}) {
                     </div>
                 </div>
             </div>
+
+            ${aiGeneratedSections.detailedBreakdownHtml ? `
+            <!-- 섹션 4-1: 심층 상세 분석 (Detailed Quantitative Breakdown) -->
+            <div class="report-section">
+                <div class="report-section-title">🔬 4-1. 심층 상세 분석 (상·하위 구조 · 구간 분포 · 다변량 상관 · 실행 로드맵)</div>
+                <div class="report-editable" contenteditable="${appState.isReportEditMode}">
+                    ${aiGeneratedSections.detailedBreakdownHtml}
+                </div>
+            </div>
+            ` : ''}
 
             <!-- 섹션 5: AI 전략적 제언 및 실행 권고사항 -->
             <div class="report-section">
@@ -1007,6 +1051,16 @@ export function buildBuiltinAIReport(ctx = {}) {
         outlierDiagnostic: applyToneToText(outlierDiagnostic, tone),
         cvDiagnostic: applyToneToText(cvDiagnostic, tone),
         spreadDiagnostic: applyToneToText(spreadDiagnostic, tone),
+        detailedBreakdownHtml: ctx.depth === 'detailed'
+            ? buildDetailedBreakdownHtml({
+                tone, xColName, yColName, count, sum, mean, median, q1, q3, iqr,
+                top1, top2, top3, bottom1, bottom2, top20Share, topBottomRatio,
+                aboveMeanCount: ctx.aboveMeanCount ?? 0,
+                aboveMeanPct: ctx.aboveMeanPct ?? '0',
+                hhi: ctx.hhi ?? 0,
+                outliers, multiColAnalysis, sortedDesc
+            })
+            : '',
         recommendations: recommendations.map(r => ({
             title: r.title,
             desc: applyToneToText(r.desc, tone)
@@ -1015,30 +1069,111 @@ export function buildBuiltinAIReport(ctx = {}) {
 }
 
 /**
+ * 심층 상세 분석 HTML 생성 (상·하위 비교, 구간 분포, 다변량 상관관계, 단계별 로드맵)
+ */
+function buildDetailedBreakdownHtml(ctx) {
+    const {
+        tone = 'formal', xColName, yColName, count, sum, mean, median, q1, q3, iqr,
+        top1, top2, top3, bottom1, bottom2, top20Share, topBottomRatio,
+        aboveMeanCount, aboveMeanPct, hhi, outliers = [], multiColAnalysis, sortedDesc = []
+    } = ctx;
+
+    const topItems = sortedDesc.slice(0, 3);
+    const bottomItems = sortedDesc.slice(-2).reverse();
+    const rowHtml = (item, rankLabel) => {
+        const share = sum > 0 ? ((item.value / sum) * 100).toFixed(1) : '0.0';
+        const vsMean = mean > 0 ? (item.value / mean).toFixed(2) : '0.00';
+        return `<tr><td><strong>${rankLabel}</strong></td><td>${item.label}</td><td>${fmt(item.value)}</td><td>${share}%</td><td>평균 대비 ${vsMean}×</td></tr>`;
+    };
+
+    const hhiLevel = hhi >= 2500 ? '고집중(독과점형)' : (hhi >= 1500 ? '중집중(선도형)' : '분산(경쟁균형형)');
+    const skewDesc = mean > median * 1.15
+        ? `산술평균(${fmt(Math.round(mean))})이 중앙값(${fmt(Math.round(median))})보다 높아 일부 상위 개체가 전체 평균을 견인하는 우측 꼬리 분포(Right-Skewed)입니다.`
+        : (mean < median * 0.85
+            ? `산술평균(${fmt(Math.round(mean))})이 중앙값(${fmt(Math.round(median))})보다 낮아 하위 극단치의 하방 압력이 존재하는 좌측 꼬리 분포입니다.`
+            : `산술평균(${fmt(Math.round(mean))})과 중앙값(${fmt(Math.round(median))})이 유사해 비교적 대칭적인 분포를 유지하고 있습니다.`);
+
+    const corrHtml = (multiColAnalysis?.correlations?.length)
+        ? multiColAnalysis.correlations.map(c => {
+            const rStr = c.r !== null ? c.r.toFixed(2) : 'N/A';
+            const strength = c.r === null ? '표본 부족'
+                : (Math.abs(c.r) >= 0.7 ? '강한 ' + (c.r > 0 ? '양(+)' : '음(-)') + '의 상관관계'
+                    : (Math.abs(c.r) >= 0.3 ? '중간 수준의 ' + (c.r > 0 ? '양(+)' : '음(-)') + '의 상관관계' : '약한 상관관계'));
+            return `<li><strong>${yColName} ↔ ${c.name}:</strong> 피어슨 상관계수 <code>r = ${rStr}</code> (${strength}) · 평균 ${fmt(Math.round(c.mean))}</li>`;
+        }).join('')
+        : `<li>단일 수치 지표 데이터셋입니다. 집중도 지수(HHI)는 <strong>${hhi.toLocaleString()}</strong>으로 <strong>${hhiLevel}</strong> 구조로 진단되었습니다.</li>`;
+
+    const outlierNames = outliers.length > 0
+        ? outliers.slice(0, 5).map(o => `${o.label}(${fmt(o.value)})`).join(', ') + (outliers.length > 5 ? ` 외 ${outliers.length - 5}건` : '')
+        : '해당 없음 (모든 개체가 정상 신뢰구간 내 위치)';
+
+    const rawHtml = `
+        <div class="report-deep-grid" style="margin-bottom: 12px;">
+            <div class="report-deep-card info">
+                <div class="report-deep-title">📐 1) 구간별 분포 및 집중도 정밀 진단</div>
+                <p>전체 ${count}개 ${xColName} 중 평균(${fmt(Math.round(mean))}) 이상 개체는 <strong>${aboveMeanCount}개(${aboveMeanPct}%)</strong>입니다. 핵심 50% 구간인 사분위범위(Q1 ${fmt(Math.round(q1))} ~ Q3 ${fmt(Math.round(q3))}) 폭은 <strong>${fmt(Math.round(iqr))}</strong>이며, ${skewDesc}</p>
+                <p style="margin-top:6px;"><strong>이상치 목록:</strong> ${outlierNames}</p>
+            </div>
+            <div class="report-deep-card">
+                <div class="report-deep-title">🔗 2) 다변량 상관관계 & 구조 지수(HHI)</div>
+                <ul style="margin: 4px 0 0 16px; padding: 0; line-height: 1.6;">
+                    ${corrHtml}
+                </ul>
+            </div>
+        </div>
+        <div style="margin-bottom: 12px;">
+            <div class="report-deep-title" style="margin-bottom: 6px;">🏆 3) 상위 Top 3 vs 하위 Bottom 2 정량 비교</div>
+            <table class="report-table">
+                <thead>
+                    <tr><th>구분</th><th>${xColName}</th><th>${yColName}</th><th>전체 점유율</th><th>평균 대비</th></tr>
+                </thead>
+                <tbody>
+                    ${topItems.map((it, i) => rowHtml(it, `상위 ${i + 1}위`)).join('')}
+                    ${bottomItems.map((it, i) => rowHtml(it, `하위 ${i + 1}위`)).join('')}
+                </tbody>
+            </table>
+        </div>
+        <div class="report-deep-card success">
+            <div class="report-deep-title">🗓️ 4) 단계별 실행 로드맵 (Short / Mid / Long-Term)</div>
+            <ul style="margin: 4px 0 0 16px; padding: 0; line-height: 1.65;">
+                <li><strong>단기 (1개월):</strong> 최상위 [${top1.label}] 성과 요인 표준화 및 이상치(${outliers.length}건) 원인 검증 완료.</li>
+                <li><strong>중기 (3개월):</strong> 평균 미만 하위군([${bottom1.label}] 등) 집중 코칭으로 상·하위 격차(${topBottomRatio}배) 15% 이상 축소.</li>
+                <li><strong>장기 (6개월):</strong> 상위 20% 편중도(${top20Share}%) 완화 및 중위권 차세대 핵심 동력 육성 체계 정착.</li>
+            </ul>
+        </div>
+    `;
+    return applyToneToText(rawHtml, tone);
+}
+
+/**
  * Gemini LLM API 호출
  */
 async function callGeminiReportAPI(apiKey, data) {
+    const depthGuide = data.depth === 'detailed'
+        ? '심층 상세 분석 모드입니다. executiveSummary는 4~5문단으로 사분위수(Q1/Q3/IQR), 평균 이상 비율, 다변량 상관관계, 상·하위 비교까지 매우 구체적이고 깊이 있게 서술하고, recommendations도 실행 단계와 수치 목표를 포함해 4~5개로 작성하세요.'
+        : '표준 요약 분석 모드입니다.';
     const prompt = `
 당신은 최고의 데이터 분석가이자 수석 경영 컨설턴트입니다. 다음 데이터 통계 요약치를 바탕으로 전문적인 한국어 분석 보고서 콘텐츠를 JSON 형식으로 작성해 주세요.
 
 [데이터 통계 정보]
 - 보고서 유형: ${data.typeLabel || data.type} (유형 코드: ${data.type})
+- 분석 깊이: ${depthGuide}
 - 작성 지침: 선택된 보고서 유형의 핵심 목적과 관점(통계적 유의성, 리스크, 랭킹 벤치마킹, 데이터 분포, 성장 시나리오, 자원 효율성, 실무 액션플랜 등)에 최적화된 심층적인 전문 비즈니스 분석 내용을 작성하세요.
 - 문체 어조: ${data.toneLabel || data.tone} (어조 코드: ${data.tone})
 - 문체 지침: 지정된 어조의 문체 특성(격식체, 분석가체, 실무보고체, 전략컨설팅체, 리스크감사체, 그로스해킹체, 개조식브리핑체 등)을 본문 전체와 실행 권고 문장에 일관되게 적용하세요.
 - 파일명: ${data.fileName}
 - 분석 지표: [X: ${data.xColName}] × [Y: ${data.yColName}]
-- 건수: ${data.count}
+- 건수: ${data.count} (평균 이상 개체: ${data.aboveMeanCount}건 / ${data.aboveMeanPct}%)
 - 합계: ${data.sum}
-- 평균: ${data.mean}
-- 중앙값: ${data.median}
+- 평균: ${data.mean}, 중앙값: ${data.median}, Q1: ${data.q1}, Q3: ${data.q3}, IQR: ${data.iqr}
 - 최소: ${data.min}, 최대: ${data.max}
-- 표준편차: ${data.stddev}, 변동계수(CV): ${data.cv}%
+- 표준편차: ${data.stddev}, 변동계수(CV): ${data.cv}%, 집중도(HHI): ${data.hhi}
 - 최상위: ${data.top1.label} (${data.top1.value})
 - 상위 20% 점유율: ${data.top20Share}%
 - 최하위: ${data.bottom1.label} (${data.bottom1.value})
 - 격차 배율: ${data.topBottomRatio}배
 - 이상치 건수: ${data.outliers.length}건
+- 다변량 상관정보: ${data.multiColAnalysis?.info || '단일 수치 지표'}
 
 반드시 아래 JSON 포맷만을 반환하세요 (마크다운 코드블록이나 불필요한 서문 없이 오직 순수 JSON 문자열만 반환):
 {
@@ -1079,27 +1214,31 @@ async function callGeminiReportAPI(apiKey, data) {
  * OpenAI GPT API 호출
  */
 async function callOpenAIReportAPI(apiKey, data) {
+    const depthGuide = data.depth === 'detailed'
+        ? '심층 상세 분석 모드입니다. executiveSummary는 4~5문단으로 사분위수(Q1/Q3/IQR), 평균 이상 비율, 다변량 상관관계, 상·하위 비교까지 매우 구체적이고 깊이 있게 서술하고, recommendations도 실행 단계와 수치 목표를 포함해 4~5개로 작성하세요.'
+        : '표준 요약 분석 모드입니다.';
     const prompt = `
 당신은 최고의 데이터 분석가이자 수석 경영 컨설턴트입니다. 다음 데이터 통계 요약치를 바탕으로 전문적인 한국어 분석 보고서 콘텐츠를 JSON 형식으로 작성해 주세요.
 
 [데이터 통계 정보]
 - 보고서 유형: ${data.typeLabel || data.type} (유형 코드: ${data.type})
+- 분석 깊이: ${depthGuide}
 - 작성 지침: 선택된 보고서 유형의 핵심 목적과 관점(통계적 유의성, 리스크, 랭킹 벤치마킹, 데이터 분포, 성장 시나리오, 자원 효율성, 실무 액션플랜 등)에 최적화된 심층적인 전문 비즈니스 분석 내용을 작성하세요.
 - 문체 어조: ${data.toneLabel || data.tone} (어조 코드: ${data.tone})
 - 문체 지침: 지정된 어조의 문체 특성(격식체, 분석가체, 실무보고체, 전략컨설팅체, 리스크감사체, 그로스해킹체, 개조식브리핑체 등)을 본문 전체와 실행 권고 문장에 일관되게 적용하세요.
 - 파일명: ${data.fileName}
 - 분석 지표: [X: ${data.xColName}] × [Y: ${data.yColName}]
-- 건수: ${data.count}
+- 건수: ${data.count} (평균 이상 개체: ${data.aboveMeanCount}건 / ${data.aboveMeanPct}%)
 - 합계: ${data.sum}
-- 평균: ${data.mean}
-- 중앙값: ${data.median}
+- 평균: ${data.mean}, 중앙값: ${data.median}, Q1: ${data.q1}, Q3: ${data.q3}, IQR: ${data.iqr}
 - 최소: ${data.min}, 최대: ${data.max}
-- 표준편차: ${data.stddev}, 변동계수(CV): ${data.cv}%
+- 표준편차: ${data.stddev}, 변동계수(CV): ${data.cv}%, 집중도(HHI): ${data.hhi}
 - 최상위: ${data.top1.label} (${data.top1.value})
 - 상위 20% 점유율: ${data.top20Share}%
 - 최하위: ${data.bottom1.label} (${data.bottom1.value})
 - 격차 배율: ${data.topBottomRatio}배
 - 이상치 건수: ${data.outliers.length}건
+- 다변량 상관정보: ${data.multiColAnalysis?.info || '단일 수치 지표'}
 
 반드시 아래 JSON 포맷만을 반환하세요 (마크다운 코드블록 없이 순수 JSON만 반환):
 {
@@ -1243,6 +1382,9 @@ export function bindAiReportEvents() {
         }
     });
     btnGenerateAiReport?.addEventListener('click', () => generateAIReport({ stream: true }));
+    $('ai-report-depth')?.addEventListener('change', () => {
+        if (appState.parsedData) generateAIReport({ stream: false });
+    });
 
     // 닫기 핸들러
     btnCloseReportModal?.addEventListener('click', () => {
