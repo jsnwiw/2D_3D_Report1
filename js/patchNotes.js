@@ -7,8 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!btn || !modal || !close || !body) return;
 
-  // Load notes JSON
-  fetch('patch_notes.json')
+  // Load notes JSON (supports root and /desktop/, /mobile/ subdirectories)
+  const jsonPath = /\/(desktop|mobile)\//.test(window.location.pathname) ? '../patch_notes.json' : 'patch_notes.json';
+  fetch(jsonPath)
     .then((resp) => resp.json())
     .then((data) => {
       const { version, date, notes } = data;
