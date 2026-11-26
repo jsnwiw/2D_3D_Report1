@@ -125,23 +125,13 @@ function createDataMaterial(color, extraOpts = {}) {
 export async function initThreeScene() {
     // Detect low‑spec device early and enable lightweight mode
     // Simple heuristic: few logical processors or low GPU tier
-    const isLowSpecDevice = () => {
-        const cores = navigator.hardwareConcurrency || 0;
-        // If less than 4 cores, consider low‑spec
-        if (cores && cores < 4) return true;
-        // Use WebGPU adapter info if available
-        if (appState.gpuEngineState && appState.gpuEngineState.gpuName) {
-            const lowGpuKeywords = ['Intel HD', 'Intel UHD', 'Mali', 'Adreno 3'];
-            const name = appState.gpuEngineState.gpuName.toLowerCase();
-            if (lowGpuKeywords.some(k => name.includes(k.toLowerCase()))) return true;
-        }
-        return false;
-    };
-    if (isLowSpecDevice()) {
-        // Turn on low‑spec mode before any heavy geometry is created
-        setLowSpecMode(true, '3d-lite', { manual: true, initial: true });
-        console.log('[LowSpec] Device detected as low‑spec – activating 3d‑lite mode');
-    }
+    // Low‑spec auto‑detect disabled for debugging – always use full 3D mode
+    const isLowSpecDevice = () => false;
+    // Previously automatic low‑spec activation removed
+    // if (isLowSpecDevice()) {
+    //     setLowSpecMode(true, '3d-lite', { manual: true, initial: true });
+    //     console.log('[LowSpec] Device detected as low‑spec – activating 3d‑lite mode');
+    // }
     const container = $('canvas-container');
     if (!container) return;
 
@@ -1067,7 +1057,7 @@ function setupRaycasting() {
             if (tooltip) tooltip.style.display = 'none';
             container.style.cursor = 'grab';
         }
-    });
+    };)
 
     // 터치/클릭 시 3D 메쉬 판별 및 선택 처리 함수
     const handleTapOrClick = (clientX, clientY) => {

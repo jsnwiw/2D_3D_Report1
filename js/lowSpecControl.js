@@ -79,4 +79,8 @@
   if (!window.__setLowSpecMode) {
     window.__setLowSpecMode = handleLowSpecChange;
   }
+  // 디버깅: 페이지 로드 시 무조건 일반 3D 모드로 전환
+  if (window.__setLowSpecMode) {
+    window.__setLowSpecMode(false, '3d-lite');
+  }
 })();

@@ -103,10 +103,8 @@ window.appState = appState;
 // 저사양 상태 초기화 함수 – 페이지 로드 시 호출
 // ---------------------------------------------------------------------------
 window.__initLowSpecStateOnLoad = () => {
-    // lowspec.js 에서 정의한 __getInitialLowSpecState 가 존재하면 사용, 없으면 기본값 적용
-    const init = (typeof window.__getInitialLowSpecState === 'function')
-        ? window.__getInitialLowSpecState()
-        : { enabled: false, type: '3d-lite', autoAdapt: true };
+    // Low‑spec auto‑detect disabled for debugging – always start in full 3D mode
+    const init = { enabled: false, type: '3d-lite', autoAdapt: true };
     appState.lowSpecMode = init.enabled;
     appState.lowSpecType = init.type;
     appState.autoAdaptLowSpec = init.autoAdapt;

@@ -12,7 +12,7 @@
          ======================================================= -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="3D시각화">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -24,7 +24,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- 엑셀(.xlsx, .xls) 바이너리 파싱 지원 SheetJS 라이브러리 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="lowspec.js"></script>
+    
+<script type="module" src="js/lowSpecControl.js" defer></script>
 </head>
 <body>
 <header id="system-info" class="system-info no-print" style="display: none !important;">
@@ -950,8 +951,11 @@
         }
     </script>
     <!-- ES6 모듈 방식으로 메인 자바스크립트 실행 -->
-    <script type="module" src="main.js"></script>
+    <script type="module" src="js/lowSpecControl.js"></script>
+    <script src="js/lowSpecControl.js"></script>
+    <script type="module" src="js/main.js"></script>
     <script src="js/theme-toggle.js"></script>
+    <script src="js/lowSpecControl.js"></script
     <script src="js/patchNotes.js"></script>
 </body>
 </html>
