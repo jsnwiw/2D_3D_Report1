@@ -468,15 +468,15 @@ export async function generateAIReport(options = {}) {
             aiGeneratedSections = buildBuiltinAIReport({
                 type: resolvedType, typeLabel: resolvedTypeLabel, tone: resolvedTone, toneLabel: resolvedToneLabel, depth, xColName, yColName, count, sum, mean, median, min, max, range, stddev, cv,
                 top1, top2, top3, bottom1, bottom2, top20Count, top20Sum, top20Share, top1Share, top3Share, topBottomRatio,
-                aboveMeanCount, aboveMeanPct, hhi,
+                aboveMeanCount, aboveMeanPct, hhi, values,
                 outliers, highOutliers, lowOutliers, q1, q3, iqr, upperLimit, lowerLimit, sortedDesc, multiColAnalysis,
                 fileName: appState.currentUploadedFile ? appState.currentUploadedFile.name : (fileNameDisplay?.textContent || '데이터 세트')
             });
-        } else if (depth === 'detailed' && !aiGeneratedSections.detailedBreakdownHtml) {
+        } else if (depth !== 'standard' && !aiGeneratedSections.detailedBreakdownHtml) {
             aiGeneratedSections.detailedBreakdownHtml = buildDetailedBreakdownHtml({
-                tone: resolvedTone, xColName, yColName, count, sum, mean, median, q1, q3, iqr,
+                depth, tone: resolvedTone, xColName, yColName, count, sum, mean, median, stddev, q1, q3, iqr,
                 top1, top2, top3, bottom1, bottom2, top20Share, topBottomRatio,
-                aboveMeanCount, aboveMeanPct, hhi, outliers, multiColAnalysis, sortedDesc
+                aboveMeanCount, aboveMeanPct, hhi, values, outliers, multiColAnalysis, sortedDesc
             });
         }
 
@@ -1051,13 +1051,15 @@ export function buildBuiltinAIReport(ctx = {}) {
         outlierDiagnostic: applyToneToText(outlierDiagnostic, tone),
         cvDiagnostic: applyToneToText(cvDiagnostic, tone),
         spreadDiagnostic: applyToneToText(spreadDiagnostic, tone),
-        detailedBreakdownHtml: ctx.depth === 'detailed'
+        detailedBreakdownHtml: ctx.depth !== 'standard'
             ? buildDetailedBreakdownHtml({
-                tone, xColName, yColName, count, sum, mean, median, q1, q3, iqr,
+                depth: ctx.depth || 'detailed',
+                tone, xColName, yColName, count, sum, mean, median, stddev, q1, q3, iqr,
                 top1, top2, top3, bottom1, bottom2, top20Share, topBottomRatio,
                 aboveMeanCount: ctx.aboveMeanCount ?? 0,
                 aboveMeanPct: ctx.aboveMeanPct ?? '0',
                 hhi: ctx.hhi ?? 0,
+                values: ctx.values || [],
                 outliers, multiColAnalysis, sortedDesc
             })
             : '',
@@ -1073,13 +1075,16 @@ export function buildBuiltinAIReport(ctx = {}) {
  */
 function buildDetailedBreakdownHtml(ctx) {
     const {
-        tone = 'formal', xColName, yColName, count, sum, mean, median, q1, q3, iqr,
+        depth = 'detailed',
+        tone = 'formal', xColName, yColName, count, sum, mean, median, stddev = 0, q1, q3, iqr,
         top1, top2, top3, bottom1, bottom2, top20Share, topBottomRatio,
-        aboveMeanCount, aboveMeanPct, hhi, outliers = [], multiColAnalysis, sortedDesc = []
+        aboveMeanCount, aboveMeanPct, hhi, values = [], outliers = [], multiColAnalysis, sortedDesc = []
     } = ctx;
 
-    const topItems = sortedDesc.slice(0, 3);
-    const bottomItems = sortedDesc.slice(-2).reverse();
+    const topN = depth === 'comprehensive' ? 5 : 3;
+    const bottomN = depth === 'comprehensive' ? 5 : 2;
+    const topItems = sortedDesc.slice(0, topN);
+    const bottomItems = sortedDesc.slice(-bottomN).reverse();
     const rowHtml = (item, rankLabel) => {
         const share = sum > 0 ? ((item.value / sum) * 100).toFixed(1) : '0.0';
         const vsMean = mean > 0 ? (item.value / mean).toFixed(2) : '0.00';
@@ -1107,6 +1112,60 @@ function buildDetailedBreakdownHtml(ctx) {
         ? outliers.slice(0, 5).map(o => `${o.label}(${fmt(o.value)})`).join(', ') + (outliers.length > 5 ? ` 외 ${outliers.length - 5}건` : '')
         : '해당 없음 (모든 개체가 정상 신뢰구간 내 위치)';
 
+    // 3단계(executive) & 4단계(comprehensive): 리스크 민감도 & What-If 시뮬레이션
+    let executiveExtraHtml = '';
+    if (depth === 'executive' || depth === 'comprehensive') {
+        const top1ShareNum = sum > 0 ? (top1.value / sum) * 100 : 0;
+        const remainMean = count > 1 ? (sum - top1.value) / (count - 1) : 0;
+        const bottomQuartile = sortedDesc.filter(d => d.value < q1);
+        const liftTarget = median > 0 ? median : mean;
+        const liftGain = bottomQuartile.reduce((acc, d) => acc + Math.max(0, liftTarget - d.value), 0);
+        const liftPct = sum > 0 ? ((liftGain / sum) * 100).toFixed(1) : '0.0';
+        const top10Count = Math.max(1, Math.round(count * 0.1));
+        const top10Share = sum > 0 ? ((sortedDesc.slice(0, top10Count).reduce((a, b) => a + b.value, 0) / sum) * 100).toFixed(1) : '0.0';
+
+        executiveExtraHtml = `
+        <div class="report-deep-grid" style="margin-top: 12px;">
+            <div class="report-deep-card warning">
+                <div class="report-deep-title">🛡️ 5) 핵심 개체 이탈 민감도 분석 (Stress Test)</div>
+                <p>최상위 1위 <strong>[${top1.label}]</strong> 단일 개체 변동 시 전체 ${yColName}의 <strong>${top1ShareNum.toFixed(1)}%</strong>가 직접 영향을 받으며, 제외 시 잔여 ${Math.max(0, count - 1)}개 평균은 <strong>${fmt(Math.round(remainMean))}</strong>로 변동합니다. 최상위 10%(${top10Count}개) 누적 점유율은 <strong>${top10Share}%</strong>입니다.</p>
+            </div>
+            <div class="report-deep-card info">
+                <div class="report-deep-title">🔮 6) What-If 목표 개선 시뮬레이션</div>
+                <p>하위 25% 구간(${bottomQuartile.length}개 개체, Q1 미만)을 중앙값(<strong>${fmt(Math.round(liftTarget))}</strong>) 수준까지 끌어올릴 경우, 총합이 <strong>+${fmt(Math.round(liftGain))} (+${liftPct}%)</strong> 순증가하는 레버리지 효과가 기대됩니다.</p>
+            </div>
+        </div>`;
+    }
+
+    // 4단계(comprehensive): 백분위수 프로파일 & Z-Score 정밀 감사
+    let comprehensiveExtraHtml = '';
+    if (depth === 'comprehensive') {
+        const pct = (p) => values.length ? values[Math.min(values.length - 1, Math.floor((values.length - 1) * p))] : 0;
+        const zOutliers = stddev > 0
+            ? sortedDesc.map(d => ({ ...d, z: (d.value - mean) / stddev })).filter(d => Math.abs(d.z) >= 2.0)
+            : [];
+        const zText = zOutliers.length
+            ? zOutliers.slice(0, 6).map(d => `${d.label} (<code>Z=${d.z >= 0 ? '+' : ''}${d.z.toFixed(2)}</code>)`).join(', ')
+            : '표준점수 |Z| ≥ 2.0에 해당하는 극단 개체 없음';
+
+        comprehensiveExtraHtml = `
+        <div style="margin-top: 12px;">
+            <div class="report-deep-title" style="margin-bottom: 6px;">🧬 7) 백분위수(Percentile) 분포 프로파일 & Z-Score 정밀 감사</div>
+            <table class="report-table" style="margin-bottom: 10px;">
+                <thead>
+                    <tr><th>P10 (하위 10%)</th><th>P25 (Q1)</th><th>P50 (중앙값)</th><th>P75 (Q3)</th><th>P90 (상위 10%)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>${fmt(Math.round(pct(0.1)))}</td><td>${fmt(Math.round(q1))}</td><td>${fmt(Math.round(median))}</td><td>${fmt(Math.round(q3))}</td><td>${fmt(Math.round(pct(0.9)))}</td></tr>
+                </tbody>
+            </table>
+            <div class="report-deep-card">
+                <div class="report-deep-title">📏 표준점수(Z-Score |Z| ≥ 2.0) 이상치 감사 결과</div>
+                <p>${zText}</p>
+            </div>
+        </div>`;
+    }
+
     const rawHtml = `
         <div class="report-deep-grid" style="margin-bottom: 12px;">
             <div class="report-deep-card info">
@@ -1122,7 +1181,7 @@ function buildDetailedBreakdownHtml(ctx) {
             </div>
         </div>
         <div style="margin-bottom: 12px;">
-            <div class="report-deep-title" style="margin-bottom: 6px;">🏆 3) 상위 Top 3 vs 하위 Bottom 2 정량 비교</div>
+            <div class="report-deep-title" style="margin-bottom: 6px;">🏆 3) 상위 Top ${topItems.length} vs 하위 Bottom ${bottomItems.length} 정량 비교</div>
             <table class="report-table">
                 <thead>
                     <tr><th>구분</th><th>${xColName}</th><th>${yColName}</th><th>전체 점유율</th><th>평균 대비</th></tr>
@@ -1141,6 +1200,8 @@ function buildDetailedBreakdownHtml(ctx) {
                 <li><strong>장기 (6개월):</strong> 상위 20% 편중도(${top20Share}%) 완화 및 중위권 차세대 핵심 동력 육성 체계 정착.</li>
             </ul>
         </div>
+        ${executiveExtraHtml}
+        ${comprehensiveExtraHtml}
     `;
     return applyToneToText(rawHtml, tone);
 }
@@ -1149,9 +1210,13 @@ function buildDetailedBreakdownHtml(ctx) {
  * Gemini LLM API 호출
  */
 async function callGeminiReportAPI(apiKey, data) {
-    const depthGuide = data.depth === 'detailed'
-        ? '심층 상세 분석 모드입니다. executiveSummary는 4~5문단으로 사분위수(Q1/Q3/IQR), 평균 이상 비율, 다변량 상관관계, 상·하위 비교까지 매우 구체적이고 깊이 있게 서술하고, recommendations도 실행 단계와 수치 목표를 포함해 4~5개로 작성하세요.'
-        : '표준 요약 분석 모드입니다.';
+    const depthGuideMap = {
+        standard: '1단계 표준 요약 분석 모드입니다. 핵심 수치와 요점을 간결하게 작성하세요.',
+        detailed: '2단계 심층 상세 분석 모드입니다. executiveSummary는 4~5문단으로 사분위수(Q1/Q3/IQR), 평균 이상 비율, 다변량 상관관계, 상·하위 비교까지 구체적으로 서술하고, recommendations도 4개로 작성하세요.',
+        executive: '3단계 컨설팅·전략 심화 모드입니다. 맥킨지/BCG 스타일로 핵심 개체 이탈 민감도, 하위 25% 개선 시 What-If 시뮬레이션 효과, 전략적 레버리지 포인트를 5문단 이상 깊이 있게 작성하세요.',
+        comprehensive: '4단계 풀스펙 종합 감사 모드입니다. 백분위 분포, Z-Score 기반 이상치 검증, 다변량 인과 추정, 리스크 민감도, 단기/중기/장기 KPI 실행 로드맵까지 전수 감사 수준으로 매우 상세하게 작성하세요.'
+    };
+    const depthGuide = depthGuideMap[data.depth] || depthGuideMap.detailed;
     const prompt = `
 당신은 최고의 데이터 분석가이자 수석 경영 컨설턴트입니다. 다음 데이터 통계 요약치를 바탕으로 전문적인 한국어 분석 보고서 콘텐츠를 JSON 형식으로 작성해 주세요.
 
@@ -1214,9 +1279,13 @@ async function callGeminiReportAPI(apiKey, data) {
  * OpenAI GPT API 호출
  */
 async function callOpenAIReportAPI(apiKey, data) {
-    const depthGuide = data.depth === 'detailed'
-        ? '심층 상세 분석 모드입니다. executiveSummary는 4~5문단으로 사분위수(Q1/Q3/IQR), 평균 이상 비율, 다변량 상관관계, 상·하위 비교까지 매우 구체적이고 깊이 있게 서술하고, recommendations도 실행 단계와 수치 목표를 포함해 4~5개로 작성하세요.'
-        : '표준 요약 분석 모드입니다.';
+    const depthGuideMap = {
+        standard: '1단계 표준 요약 분석 모드입니다. 핵심 수치와 요점을 간결하게 작성하세요.',
+        detailed: '2단계 심층 상세 분석 모드입니다. executiveSummary는 4~5문단으로 사분위수(Q1/Q3/IQR), 평균 이상 비율, 다변량 상관관계, 상·하위 비교까지 구체적으로 서술하고, recommendations도 4개로 작성하세요.',
+        executive: '3단계 컨설팅·전략 심화 모드입니다. 맥킨지/BCG 스타일로 핵심 개체 이탈 민감도, 하위 25% 개선 시 What-If 시뮬레이션 효과, 전략적 레버리지 포인트를 5문단 이상 깊이 있게 작성하세요.',
+        comprehensive: '4단계 풀스펙 종합 감사 모드입니다. 백분위 분포, Z-Score 기반 이상치 검증, 다변량 인과 추정, 리스크 민감도, 단기/중기/장기 KPI 실행 로드맵까지 전수 감사 수준으로 매우 상세하게 작성하세요.'
+    };
+    const depthGuide = depthGuideMap[data.depth] || depthGuideMap.detailed;
     const prompt = `
 당신은 최고의 데이터 분석가이자 수석 경영 컨설턴트입니다. 다음 데이터 통계 요약치를 바탕으로 전문적인 한국어 분석 보고서 콘텐츠를 JSON 형식으로 작성해 주세요.
 
