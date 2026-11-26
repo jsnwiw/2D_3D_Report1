@@ -35,7 +35,7 @@
             <div id="system-gpu">🎮 GPU 모델: 감지 중...</div>
             <div id="gpu-engine-info">⚡ 엔진: 감지 중...</div>
         </header>
-<div id="patch-notes-modal" class="modal glass" style="display:none;">
+<div id="patch-notes-modal" class="modal" style="display:none;">
   <div class="modal-content">
     <span id="patch-notes-close" class="close">&times;</span>
     <h2>패치 노트</h2>
@@ -91,7 +91,7 @@
     <button id="btn-patch-notes" class="patch-notes-btn" title="패치 노트 보기"><span class="toolbar-icon" aria-hidden="true">📝</span> 패치 노트</button>
             </div>
         </header>
-<div id="patch-notes-modal" class="modal glass" style="display:none;">
+<div id="patch-notes-modal" class="modal" style="display:none;">
   <div class="modal-content">
     <span id="patch-notes-close" class="close">&times;</span>
     <h2>패치 노트</h2>
@@ -111,7 +111,7 @@
             <div id="system-gpu">🎮 GPU 모델: 감지 중...</div>
             <div id="gpu-engine-info">⚡ 엔진: 감지 중...</div>
         </header>
-<div id="patch-notes-modal" class="modal glass" style="display:none;">
+<div id="patch-notes-modal" class="modal" style="display:none;">
   <div class="modal-content">
     <span id="patch-notes-close" class="close">&times;</span>
     <h2>패치 노트</h2>
@@ -165,7 +165,7 @@
     <button id="btn-patch-notes" class="patch-notes-btn" title="패치 노트 보기"><span class="toolbar-icon" aria-hidden="true">📝</span> 패치 노트</button>
             </div>
         </header>
-<div id="patch-notes-modal" class="modal glass" style="display:none;">
+<div id="patch-notes-modal" class="modal" style="display:none;">
   <div class="modal-content">
     <span id="patch-notes-close" class="close">&times;</span>
     <h2>패치 노트</h2>
@@ -174,9 +174,16 @@
 </div>
         <!-- (mobile.html 의 나머지 섹션들을 그대로 삽입 – 생략) -->
     </div>
-    <script type="module" src="js/lowSpecControl.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script src="js/lowSpecControl.js"></script>
     <script type="module" src="js/main.js"></script>
-    <script src="js/main-mobile.js"></script>
     <style>
         /* 간단한 미디어 쿼리로 뷰 전환 */
         @media (max-width: 768px) {
