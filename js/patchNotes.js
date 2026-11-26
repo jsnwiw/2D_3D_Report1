@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
   btn.addEventListener('click', () => {
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
   });
   close.addEventListener('click', () => {
     modal.style.display = 'none';

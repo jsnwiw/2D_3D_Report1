@@ -50,19 +50,77 @@
   cursor: pointer;
 }
 
-/* 패치 노트 모달: 블러 효과 제거 및 불투명 배경 */
+/* 패치 노트 모달: 블러 효과 제거 및 라이트·다크 테마 통일 */
 #patch-notes-modal,
 #patch-notes-modal .modal-content {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+#patch-notes-modal {
+  background: rgba(15, 23, 42, 0.45);
+  padding: 16px;
+}
+html[data-theme="dark"] #patch-notes-modal {
+  background: rgba(2, 6, 23, 0.72);
+}
 #patch-notes-modal .modal-content {
   background: #ffffff;
   color: #0f172a;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  border-radius: 16px;
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.18);
+  width: min(560px, 92vw);
+  padding: 22px 24px;
 }
 html[data-theme="dark"] #patch-notes-modal .modal-content {
-  background: #1e293b;
+  background: #0f172a;
   color: #f1f5f9;
+  border: 1px solid rgba(129, 140, 248, 0.32);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.6);
+}
+#patch-notes-modal h2 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #4338ca;
+}
+html[data-theme="dark"] #patch-notes-modal h2 {
+  color: #a5b4fc;
+}
+#patch-notes-modal h3 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #334155;
+}
+html[data-theme="dark"] #patch-notes-modal h3 {
+  color: #cbd5e1;
+}
+#patch-notes-modal ul {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.65;
+  font-size: 13.5px;
+}
+#patch-notes-modal .close {
+  color: #475569;
+  transition: color 0.15s ease;
+}
+#patch-notes-modal .close:hover {
+  color: #ef4444;
+}
+html[data-theme="dark"] #patch-notes-modal .close {
+  color: #94a3b8;
+}
+html[data-theme="dark"] #patch-notes-modal .close:hover {
+  color: #f87171;
+}
+.report-deep-card code {
+  background: rgba(99, 102, 241, 0.12);
+  color: #4338ca;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.92em;
 }
 
 

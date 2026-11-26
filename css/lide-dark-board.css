@@ -150,3 +150,25 @@ html[data-theme="dark"] #tooltip-name {
 html[data-theme="dark"] #tooltip-value {
   color: var(--db-text);
 }
+
+/* 하단 타임라인 플레이어 */
+html[data-theme="dark"] #timeline-player-bar {
+  background: var(--db-bg-panel);
+  border: 1px solid var(--db-border);
+  box-shadow: var(--db-shadow);
+  color: var(--db-text);
+}
+
+/* 폼 요소 통일 */
+html[data-theme="dark"] select,
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="number"],
+html[data-theme="dark"] input[type="range"] {
+  background: #1e293b;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: var(--db-text);
+}
+html[data-theme="dark"] select option {
+  background: #0f172a;
+  color: var(--db-text);
+}
