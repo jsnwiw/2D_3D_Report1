@@ -1,0 +1,115 @@
+{
+  "username": "jsnwiw",
+  "syncedAt": "2026-11-27T03:39:33.494Z",
+  "totalReposFound": 6,
+  "curatedCount": 6,
+  "projects": [
+    {
+      "name": "korea_disaster_insight",
+      "title": "한국 재난 인사이트 분석 대시보드",
+      "tag": "개인",
+      "githubUrl": "https://github.com/jsnwiw/korea_disaster_insight",
+      "demoUrl": "https://jsnwiw.github.io/korea_disaster_insight/",
+      "description": "전국 재난/재해 공공 오픈 API 실시간 수집 및 다차원 위험도 분석",
+      "language": "JavaScript",
+      "techStack": [
+        "JavaScript",
+        "Public Open Data API",
+        "Chart.js"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-11-24T01:52:28Z",
+      "createdAt": "2026-11-24T01:52:08Z"
+    },
+    {
+      "name": "2D_3D_Report1",
+      "title": "3D & 2D 인터랙티브 데이터 분석 시스템",
+      "tag": "개인",
+      "githubUrl": "https://github.com/jsnwiw/2D_3D_Report1",
+      "demoUrl": "https://jsnwiw.github.io/2D_3D_Report1/",
+      "description": "Vulkan/WebGPU 차세대 가속 3D 다차원 시각화 및 AI 리포트 스튜디오",
+      "language": "JavaScript",
+      "techStack": [
+        "Three.js",
+        "WebGPU",
+        "WebGL",
+        "Chart.js",
+        "SheetJS",
+        "PWA",
+        "JavaScript"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-11-23T02:53:59Z",
+      "createdAt": "2026-11-23T02:52:29Z"
+    },
+    {
+      "name": "NDVM",
+      "title": "NDVM - 네트워크 & 인프라 데이터 시각화 시스템",
+      "tag": "팀",
+      "githubUrl": "https://github.com/jsnwiw/NDVM",
+      "demoUrl": "https://jsnwiw.github.io/NDVM/",
+      "description": "네트워크 장비 상태 실시간 매핑 및 트래픽 플로우 토폴로지 시각화",
+      "language": "JavaScript",
+      "techStack": [
+        "JavaScript",
+        "Chart.js",
+        "Network Visualization"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-11-16T01:42:19Z",
+      "createdAt": "2026-11-16T01:19:58Z"
+    },
+    {
+      "name": "3Dvisualization",
+      "title": "3D Glass Shader & Material Studio",
+      "tag": "개인",
+      "githubUrl": "https://github.com/jsnwiw/3Dvisualization",
+      "demoUrl": "https://jsnwiw.github.io/3Dvisualization/",
+      "description": "물리 기반 렌더링(PBR) 글래스 셰이더 및 IOR 굴절/반사 실시간 스튜디오",
+      "language": "JavaScript",
+      "techStack": [
+        "Three.js",
+        "WebGL",
+        "Custom GLSL",
+        "PBR Material"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-11-11T04:04:12Z",
+      "createdAt": "2026-11-11T04:04:11Z"
+    },
+    {
+      "name": "project-presentation",
+      "title": "인터랙티브 웹 쇼케이스 프레젠테이션",
+      "tag": "솔루션",
+      "githubUrl": "https://github.com/jsnwiw/project-presentation",
+      "demoUrl": "https://jsnwiw.github.io/project-presentation/",
+      "description": "프레임워크 없는 순수 웹 표준 기반 초경량 슬라이드 엔진",
+      "language": "JavaScript",
+      "techStack": [
+        "HTML5",
+        "CSS3",
+        "JavaScript"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-10-21T00:21:39Z",
+      "createdAt": "2026-10-21T00:17:55Z"
+    },
+    {
+      "name": "korea_infrastructure_analysis",
+      "title": "대한민국 스마트 인프라 안전성 및 시설 분석",
+      "tag": "팀",
+      "githubUrl": "https://github.com/jsnwiw/korea_infrastructure_analysis",
+      "demoUrl": "https://jsnwiw.github.io/korea_infrastructure_analysis/",
+      "description": "전국 공공 인프라 시설물의 노후도 및 안전등급 통계 데이터 분석",
+      "language": "JavaScript",
+      "techStack": [
+        "JavaScript",
+        "Chart.js",
+        "Public Data Analysis"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-10-20T07:32:58Z",
+      "createdAt": "2026-10-20T07:32:56Z"
+    }
+  ]
+}

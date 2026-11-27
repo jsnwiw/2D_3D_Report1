@@ -4,7 +4,8 @@
   "description": "AI Report Studio with automated patch note management",
   "main": "index.html",
   "scripts": {
-    "add-patch": "node scripts/add_patch_note.js"
+    "add-patch": "node scripts/add_patch_note.js",
+    "sync-projects": "node scripts/sync_github_projects.js"
   },
   "author": "",
   "license": "MIT"
