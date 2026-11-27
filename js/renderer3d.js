@@ -123,6 +123,14 @@ function createDataMaterial(color, extraOpts = {}) {
  * 3D 씬 및 WebGPURenderer 초기화
  */
 export async function initThreeScene() {
+    // If ultra‑light 2D‑only mode is active, skip 3D initialization
+    if (appState.lowSpecMode && appState.lowSpecType === '2d-only') {
+        console.log('[LowSpec] 2D‑only mode active – skipping 3D renderer initialization');
+        // Hide the canvas container to avoid empty space
+        const canvasContainer = $('canvas-container');
+        if (canvasContainer) canvasContainer.style.display = 'none';
+        return;
+    }
     // Detect low‑spec device early and enable lightweight mode
     // Simple heuristic: few logical processors or low GPU tier
     // Low‑spec auto‑detect disabled for debugging – always use full 3D mode
