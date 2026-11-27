@@ -126,9 +126,7 @@ export async function initThreeScene() {
     // If ultra‑light 2D‑only mode is active, skip 3D initialization
     if (appState.lowSpecMode && appState.lowSpecType === '2d-only') {
         console.log('[LowSpec] 2D‑only mode active – skipping 3D renderer initialization');
-        // Hide the canvas container to avoid empty space
-        const canvasContainer = $('canvas-container');
-        if (canvasContainer) canvasContainer.style.display = 'none';
+        setLowSpecMode(true, '2d-only', { initial: true });
         return;
     }
     // Detect low‑spec device early and enable lightweight mode
@@ -505,6 +503,9 @@ export function getThemeColor(idx, total, overrideTheme = null) {
  * 10종 3D 지오메트리 메인 렌더러
  */
 export function render3DVisualization(labels, values) {
+    if (!appState.scene || (appState.lowSpecMode && appState.lowSpecType === '2d-only')) {
+        return;
+    }
     clearScene();
     if (!labels || !labels.length) return;
 
@@ -1224,9 +1225,18 @@ export function setLowSpecMode(enabled, type = '3d-lite', options = {}) {
     } else {
         if (lowspecCard) lowspecCard.style.display = 'none';
         if (canvasContainer) canvasContainer.style.display = 'block';
-        handleAdaptiveResize();
-        if (appState.parsedData && window.__applyVisualization) {
-            window.__applyVisualization();
+        if (!appState.renderer || !appState.scene) {
+            initThreeScene().then(() => {
+                handleAdaptiveResize();
+                if (appState.parsedData && window.__applyVisualization) {
+                    window.__applyVisualization();
+                }
+            });
+        } else {
+            handleAdaptiveResize();
+            if (appState.parsedData && window.__applyVisualization) {
+                window.__applyVisualization();
+            }
         }
         if (enabled) {
             if (options.autoTriggered) {

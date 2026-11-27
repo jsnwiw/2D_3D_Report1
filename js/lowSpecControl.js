@@ -81,6 +81,9 @@
   }
   // 디버깅: 페이지 로드 시 무조건 일반 3D 모드로 전환
   if (window.__setLowSpecMode) {
-    window.__setLowSpecMode(false, '3d-lite');
+    // Apply initial low‑spec state from appState if set, otherwise default to normal mode
+    const initEnabled = window.appState?.lowSpecMode ?? false;
+    const initType = window.appState?.lowSpecType ?? '3d-lite';
+    window.__setLowSpecMode(initEnabled, initType);
   }
 })();
