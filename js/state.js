@@ -103,8 +103,8 @@ window.appState = appState;
 // 저사양 상태 초기화 함수 – 페이지 로드 시 호출
 // ---------------------------------------------------------------------------
 window.__initLowSpecStateOnLoad = () => {
-    // Low‑spec auto‑detect disabled for debugging – always start in full 3D mode
-    const init = { enabled: false, type: '3d-lite', autoAdapt: true };
+    // Enable low‑spec mode by default and set to ultra‑light 2D‑only mode
+    const init = { enabled: true, type: '2d-only', autoAdapt: false };
     appState.lowSpecMode = init.enabled;
     appState.lowSpecType = init.type;
     appState.autoAdaptLowSpec = init.autoAdapt;
